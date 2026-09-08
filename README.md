@@ -3,7 +3,7 @@
 # Sarab: A Cause-Diagnostic Arabic Visual Hallucination Evaluation Benchmark
 
 [![GitHub Code](https://img.shields.io/badge/GitHub-Code-blue)](https://github.com/HasanBGit/Sarab-Benchmark)
-[![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Dataset-yellow)](https://huggingface.co/datasets/HassanB4/sarab)
+[![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Dataset-yellow)](https://huggingface.co/datasets/Sarab-MLLMs/sarab)
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green)](LICENSE)
 [![Data License: CC BY 4.0](https://img.shields.io/badge/Data%20License-CC%20BY%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
 
@@ -104,7 +104,7 @@ cd pipeline/review_ui && python3 server.py --port 8765
 
 1. `pip install -r requirements.txt`
 2. Data resolves via `SARAB_DATA_DIR`, else a sibling `Sarab-Dataset-HF/`, else
-   auto-download from the Hub (`HassanB4/sarab`).
+   auto-download from the Hub (`Sarab-MLLMs/sarab`).
 3. Copy `.env.template` → `.env`, set `OPENROUTER_API_KEY`.
 
 ## Reproducing an Evaluation Run
@@ -151,7 +151,7 @@ pattern-match the instruction back. Worked examples are in the paper.
 ## Data
 
 Released on Hugging Face at
-[`HassanB4/sarab`](https://huggingface.co/datasets/HassanB4/sarab), CC-BY 4.0.
+[`Sarab-MLLMs/sarab`](https://huggingface.co/datasets/Sarab-MLLMs/sarab), CC-BY 4.0.
 Each image also carries its own source license (Kaggle, Met Open Access,
 Wikimedia Commons), recorded per-record.
 

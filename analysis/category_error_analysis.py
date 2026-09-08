@@ -45,7 +45,7 @@ Usage (run from anywhere -- paths resolve like the mode scripts):
 Data resolution follows the same convention as modes/*/run_mode*.py:
 SARAB_DATA_DIR env override, else a sibling Sarab-Dataset-HF/ checkout next
 to this repo, else download+cache the dataset from the Hugging Face Hub
-(HassanB4/sarab).
+(Sarab-MLLMs/sarab).
 
 Output: one CSV + one Markdown table per breakdown, under --out-dir
 (default analysis/results/), plus a printed summary for all of them.
@@ -70,7 +70,7 @@ def _resolve_data_root():
     if sibling.exists():
         return sibling
     from huggingface_hub import snapshot_download
-    return Path(snapshot_download(repo_id="HassanB4/sarab", repo_type="dataset"))
+    return Path(snapshot_download(repo_id="Sarab-MLLMs/sarab", repo_type="dataset"))
 
 
 DATA_ROOT = _resolve_data_root()

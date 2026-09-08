@@ -67,7 +67,7 @@ def _resolve_data_root():
     if sibling.exists():
         return sibling
     from huggingface_hub import snapshot_download
-    return Path(snapshot_download(repo_id="HassanB4/sarab", repo_type="dataset"))
+    return Path(snapshot_download(repo_id="Sarab-MLLMs/sarab", repo_type="dataset"))
 
 
 DATA_ROOT = _resolve_data_root()

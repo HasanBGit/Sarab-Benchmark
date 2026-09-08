@@ -12,7 +12,7 @@ modes/*/mode*_results/
 analysis/results/
 # The dataset (images, candidate pools, per-mode question sets, and result
 # CSVs) is not committed to this repo; it lives on Hugging Face
-# (HassanB4/sarab). Scripts resolve it via SARAB_DATA_DIR, a sibling
+# (Sarab-MLLMs/sarab). Scripts resolve it via SARAB_DATA_DIR, a sibling
 # Sarab-Dataset-HF/ checkout, or an automatic Hub download. If you point
 # SARAB_DATA_DIR at a directory inside this repo for local development,
 # ignore it here too:
