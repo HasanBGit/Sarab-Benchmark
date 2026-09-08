@@ -7,11 +7,11 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green)](LICENSE)
 [![Data License: CC BY 4.0](https://img.shields.io/badge/Data%20License-CC%20BY%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
 
-An Arabic visual hallucination benchmark for MLLMs, modeled on Liu et al.'s CVPR
-2025 PhD benchmark, extended with an Arab/Islamic cultural counter-common-sense
-mode and an absent-answer-detection mode. This repo holds the data pipeline,
-per-mode evaluation scripts, analysis tools, and review UI. Dataset (images,
-captions, results) lives on Hugging Face; see [Data](#data).
+An Arabic visual hallucination benchmark for MLLMs, with an Arab/Islamic
+cultural counter-common-sense mode and an absent-answer-detection mode. This
+repo holds the data pipeline, per-mode evaluation scripts, analysis tools, and
+review UI. Dataset (images, captions, results) lives on Hugging Face; see
+[Data](#data).
 
 ## Authors
 
@@ -30,7 +30,7 @@ Five modes, each isolating a different hallucination trigger:
 - **icc** (incorrect context): image + a factually wrong caption. sec + icc give
   the Cross-modal Arabic Trust Ratio (CATR).
 - **ccs** (cultural counter-common-sense): AI-generated Arab/Islamic cultural-norm
-  violations, in place of PhD-ccs's Western imagery.
+  violations.
 - **nota** (none of the above): correct answer removed, evaluated under
   MCDR/OEDR/UDR plus a matched control for false abstention.
 
@@ -127,7 +127,7 @@ Temperature 0, forced single-word/letter output.
 إجابتك كلمة واحدة فقط: نعم أو لا. لا تضف أي شرح أو علامات ترقيم أو كلمات أخرى.
 ```
 
-**sec / icc** (base instruction + one sentence from Liu et al.; caption prepended):
+**sec / icc** (base instruction + one added anti-trust sentence; caption prepended):
 ```
 ...لا تضف أي شرح أو علامات ترقيم أو كلمات أخرى. في حال وجود تعارض بين السياق
 النصي المرفق ومحتوى الصورة، اعتمد على الصورة.
@@ -246,9 +246,8 @@ unaffected. Full discussion in the paper.
 ## Acknowledgements
 
 Thanks to the reviewers of the original Sarab proposal, and to the image sources
-(Kaggle, Met Open Access, Wikimedia Commons). base/sec/icc/ccs are modeled on
-Liu et al.'s PhD benchmark (CVPR 2025); nota adapts Wang et al. (2026) and
-Miyai et al.'s Unsolvable Problem Detection (ACL 2025).
+(Kaggle, Met Open Access, Wikimedia Commons). nota adapts Wang et al. (2026)
+and Miyai et al.'s Unsolvable Problem Detection (ACL 2025).
 
 ## Citation
 
