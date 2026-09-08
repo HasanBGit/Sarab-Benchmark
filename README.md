@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/sarab_logo.png" alt="Sarab logo" width="140"></p>
+
 # Sarab: A Cause-Diagnostic Arabic Visual Hallucination Evaluation Benchmark
 
 [![GitHub Code](https://img.shields.io/badge/GitHub-Code-blue)](https://github.com/HasanBGit/Sarab-Benchmark)
