@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: >-
+  This is a software citation for the Sarab-Benchmark repository. The
+  system-description paper is in preparation; this file will be updated
+  with the paper's own citation once it is published.
+type: software
+title: "Sarab: A Cause-Diagnostic Arabic Visual Hallucination Evaluation Benchmark"
+authors:
+  - family-names: Alharz
+    given-names: Zahra
+    affiliation: "Imam Abdulrahman Bin Faisal University"
+    email: alharzzahra@gmail.com
+  - family-names: Mahyoub
+    given-names: Abdulrhman
+    affiliation: "King Khalid University"
+    email: 443814561@kku.edu.sa
+  - family-names: Barmandah
+    given-names: Hassan
+    affiliation: "Umm Al-Qura University, Department of Software Engineering"
+    email: s445001043@uqu.edu.sa
+  - family-names: Alahmari
+    given-names: "Saad Saeed"
+    affiliation: "Najran University"
+    email: ssalahmari@nu.edu.sa
+repository-code: "https://github.com/HasanBGit/Sarab-Benchmark"
+url: "https://github.com/HasanBGit/Sarab-Benchmark"
+license: MIT
+date-released: "2026-09-08"

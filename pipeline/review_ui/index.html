@@ -1,0 +1,64 @@
+<title>مراجعة Sarab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+
+<div class="drawer">
+  <header class="topbar">
+    <div class="topbar-title">
+      <span class="topbar-eyebrow">Sarab &middot; مراجعة مجمع الصور</span>
+    </div>
+    <div class="topbar-progress">
+      <span id="progress-count">— / —</span>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="card" id="card">
+      <div class="card-stamp" id="stamp" aria-hidden="true"></div>
+
+      <div class="card-image-mat">
+        <img id="object-image" alt="">
+      </div>
+
+      <div class="card-rule"></div>
+
+      <div class="card-body">
+        <div class="field">
+          <span class="field-label">الوصف</span>
+          <p class="field-text field-caption" id="caption-text" dir="rtl" lang="ar"></p>
+          <textarea class="field-input field-caption" id="caption-input" dir="rtl" lang="ar" hidden></textarea>
+        </div>
+
+        <div class="field">
+          <span class="field-label">التعريف</span>
+          <p class="field-text field-hitem" id="hitem-text" dir="rtl" lang="ar"></p>
+          <textarea class="field-input field-hitem" id="hitem-input" dir="rtl" lang="ar" hidden></textarea>
+        </div>
+      </div>
+
+      <div class="card-meta" id="card-meta"></div>
+    </section>
+  </main>
+
+  <footer class="controls">
+    <div class="controls-nav">
+      <button class="btn btn-nav" id="btn-back" type="button">
+        <span class="btn-key">&larr;</span> السابق
+      </button>
+      <button class="btn btn-nav btn-forward" id="btn-forward" type="button">
+        التالي &amp; صحيح <span class="btn-key">&rarr;</span>
+      </button>
+    </div>
+    <div class="controls-actions">
+      <button class="btn btn-reject" id="btn-reject" type="button">رفض</button>
+      <button class="btn btn-edit" id="btn-edit" type="button">تعديل</button>
+      <button class="btn btn-save" id="btn-save" type="button" hidden>حفظ</button>
+      <button class="btn btn-cancel" id="btn-cancel" type="button" hidden>إلغاء</button>
+    </div>
+  </footer>
+</div>
+
+<script src="/app.js"></script>
