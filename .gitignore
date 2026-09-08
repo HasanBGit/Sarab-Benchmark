@@ -7,6 +7,9 @@ report/
 # Local evaluation output; the real result CSVs live in the dataset (see
 # below), not in this repo.
 modes/*/mode*_results/
+# Same reasoning for analysis/category_error_analysis.py's output: derived
+# from the dataset's result CSVs, regenerable on demand, not committed.
+analysis/results/
 # The dataset (images, candidate pools, per-mode question sets, and result
 # CSVs) is not committed to this repo; it lives on Hugging Face
 # (HassanB4/sarab). Scripts resolve it via SARAB_DATA_DIR, a sibling

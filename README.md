@@ -5,166 +5,107 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green)](LICENSE)
 [![Data License: CC BY 4.0](https://img.shields.io/badge/Data%20License-CC%20BY%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
 
-A cause-diagnostic Arabic visual hallucination evaluation benchmark for multimodal
-large language models (MLLMs), modeled on Liu et al.'s CVPR 2025 PhD benchmark and
-extended with an Arab and Islamic cultural counter-common-sense mode and an
-absent-answer-detection mode that PhD itself does not have. This repository holds
-the data pipeline, per-mode evaluation scripts, and human review tool. The
-underlying dataset (images, captions, hitems, and per-mode question and result
-files) lives on Hugging Face; see [Data](#data).
+An Arabic visual hallucination benchmark for MLLMs, modeled on Liu et al.'s CVPR
+2025 PhD benchmark, extended with an Arab/Islamic cultural counter-common-sense
+mode and an absent-answer-detection mode. This repo holds the data pipeline,
+per-mode evaluation scripts, analysis tools, and review UI. Dataset (images,
+captions, results) lives on Hugging Face; see [Data](#data).
 
 ## Authors
 
 Zahra Alharz (Imam Abdulrahman Bin Faisal University), Abdulrhman Mahyoub (King
-Khalid University), Hassan Barmandah (Department of Software Engineering, Umm
-Al-Qura University), Saad Saeed Alahmari (Principal Investigator, Najran
-University, corresponding author, ssalahmari@nu.edu.sa)
+Khalid University), Hassan Barmandah (Umm Al-Qura University), Saad Saeed Alahmari
+(PI, Najran University, corresponding author, ssalahmari@nu.edu.sa)
 
 ---
 
 ## System Description
 
-Sarab evaluates a model across five modes, each isolating a different
-hallucination trigger, following the three-cause taxonomy PhD introduced (visual
-ambiguity, multimodal inconsistency, counter-common-sense priors) plus a fourth
-failure mode PhD does not test, forced-choice bias under an absent correct answer.
+Five modes, each isolating a different hallucination trigger:
 
-- **base**: a plain image and a direct Arabic question, no context text.
-- **sec** (specious context): a plausible but misleading Arabic caption accompanies
-  the image.
-- **icc** (incorrect context): the caption is factually wrong rather than merely
-  misleading; sec and icc together give the Cross-modal Arabic Trust Ratio (CATR).
-- **ccs** (cultural counter-common-sense): AI-generated images depicting Arab or
-  Islamic cultural-norm violations, the first Arabic-native counter-common-sense
-  mode we are aware of, in place of PhD-ccs's Western imagery (square-wheeled cars,
-  oversized mice).
-- **nota** (none of the above): identity-naming items with the correct answer
-  removed, evaluated under three conditions (MCDR, OEDR, UDR) and paired with a
-  matched control to separate genuine absence detection from reflexive
-  over-abstention.
+- **base**: plain image + direct Arabic question, no context.
+- **sec** (specious context): image + a plausible but misleading Arabic caption.
+- **icc** (incorrect context): image + a factually wrong caption. sec + icc give
+  the Cross-modal Arabic Trust Ratio (CATR).
+- **ccs** (cultural counter-common-sense): AI-generated Arab/Islamic cultural-norm
+  violations, in place of PhD-ccs's Western imagery.
+- **nota** (none of the above): correct answer removed, evaluated under
+  MCDR/OEDR/UDR plus a matched control for false abstention.
 
-**Status, honestly.** All five modes are built and have real, OpenRouter-evaluated
-results against four models (two Gemini 2.5 variants, GPT-4o-mini, and
-Qwen2.5-VL-72B-Instruct). This is four of the eight models scoped in the original
-research proposal; none of the three Arabic-centric models (AIN, Fanar, ALLaM) have
-been evaluated yet, and that is the single most important gap to close next. base's
-result files cover a 100-task subset of its full 270-image pool, not the whole
-pool. nota's design specification called for 100 unique-identity items; the version
-actually built and evaluated has 30, rebuilt from the sec/icc candidates left over
-after those two modes' test sets were exported. Every one of these gaps is written
-up in [Limitations](#limitations) below, not smoothed over.
+**Status.** All five modes have real results against four models (Gemini 2.5
+Flash, Gemini 2.5 Flash Lite, GPT-4o-mini, Qwen2.5-VL-72B). Four of eight
+originally-scoped models; the three Arabic-centric ones (AIN, Fanar, ALLaM) aren't
+evaluated yet. base covers a 100-task subset of its 270-image pool. nota's spec
+called for 100 items; 30 were built. See [Limitations](#limitations).
 
-Contrary to our own pre-registered hypothesis that ccs would be the hardest mode
-(mirroring PhD's own finding for its Western CCS imagery), every model in our
-results scores its **highest** PhD Index on ccs. sec and icc, where a misleading or
-incorrect Arabic caption accompanies the image, are consistently the hardest, with
-models following the text over the image 45 to 71 percent of the time. Under nota,
-unprompted absent-answer detection (UDR) is a flat 0 percent across all four
-models, rising to 83 to 87 percent only once the model is explicitly told that no
-option may be correct (OEDR). See [Results](#results) for the full numbers.
+**Headline finding.** Contrary to our hypothesis, every model scores highest on
+ccs, not lowest. sec/icc (misleading/incorrect captions) are the hardest, with
+45-71% text-over-image trust. nota's unprompted detection (UDR) is 0% for every
+model, rising to 83-87% once explicitly invited to say so (OEDR).
 
 ## Key Contributions
 
-- **Sarab**, a five-mode Arabic visual hallucination evaluation benchmark built
-  on a reviewed, human-captioned pool of 281 images across five Arabic Cultural
-  Visual Vocabulary (ACVV) categories (traditional attire, cuisine, architecture,
-  cultural objects, Arabic script), with real four-model results for every mode.
-- **Sarab-ccs**, an Arab and Islamic cultural counter-common-sense mode: sacred-
-  space violations, religious and attire contradictions, seasonal and holiday
-  context mixing, sacred-text and OCR hijacking, historical anachronisms, and
-  tashkeel-diacritic contrasts.
-- **Sarab-nota**, an absent-answer-detection mode adapting the MCDR/OEDR/UDR
-  protocol to Arabic images, with a matched-control design that catches
-  reflexive over-abstention rather than crediting it as genuine detection.
-- A purpose-built **human review tool** (`pipeline/review_ui/`) used to vet every
-  image, caption, and hitem before it can enter any mode's test set.
-- **An honest accounting of what is not yet done.** See Limitations.
+- **Sarab**: five-mode benchmark, 281 reviewed images across 5 ACVV categories,
+  real four-model results per mode.
+- **Sarab-ccs**: first Arab/Islamic cultural counter-common-sense mode we're
+  aware of.
+- **Sarab-nota**: MCDR/OEDR/UDR adapted to Arabic, with a matched-control design
+  against false abstention.
+- A purpose-built **human review tool** (`pipeline/review_ui/`).
+- Honest, documented limitations (below), not smoothed over.
 
 ## Repository Structure
 
 ```
 Sarab-Benchmark/
-├── README.md                  # this file
-├── LICENSE                    # MIT (code only; each image carries its own source
-│                               #   license, recorded per-image in the dataset)
-├── requirements.txt
-├── pipeline/                  # stage 1: manifest -> image pool -> captions
-│   ├── build_image_pool.py    # merge manifest_unified.csv into image_pool.json
-│   ├── fill_captions.py       # caption-filling control layer (batches/, status)
-│   ├── captioning_prompt.md   # the captioning specification
-│   └── review_ui/             # local human review tool (Section below)
-│       ├── server.py, index.html, app.js, style.css
-└── modes/                      # stage 2: per-mode question sets + evaluation
-    ├── mode1_base/run_mode1_openrouter.py
-    ├── mode2_sec/run_mode2_openrouter.py
-    ├── mode3_icc/run_mode3_openrouter.py
-    ├── mode4_ccs/run_mode4_openrouter.py
-    └── mode5_nota/{run_mode5_openrouter.py, fill_nota_questions.py, nota_question_prompt.md}
+├── pipeline/                   # manifest -> image pool -> captions -> review
+│   ├── build_image_pool.py, fill_captions.py, captioning_prompt.md
+│   └── review_ui/              # local human review tool
+├── modes/                      # per-mode question sets + evaluation
+│   ├── mode1_base/, mode2_sec/, mode3_icc/, mode4_ccs/, mode5_nota/
+│   └── each: run_modeN_openrouter.py
+└── analysis/                   # post-hoc analysis over published results
+    ├── category_error_analysis.py
+    └── ablation_anti_trust_instruction.py
 ```
 
-This repo is code only. The dataset itself (images, candidate pools, per-mode
-question sets, and result CSVs) and the small reference samples from the two
-benchmarks Sarab's modes are modeled on (PhD, Liu et al. 2025; MM-UPD, Miyai
-et al. 2025) are not committed here; see [Data](#data).
+Code only: the dataset itself is not committed here; see [Data](#data).
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    A["Source manifest<br/>Kaggle, Met Open Access, Wikimedia"] --> B["Image pool<br/>build_image_pool.py"]
-    B --> C["Captioning<br/>fill_captions.py"]
-    C --> D["Human review<br/>pipeline/review_ui"]
-    D --> E["Per-mode question sets<br/>base, sec, icc, ccs, nota"]
-    E --> F["Model evaluation<br/>run_modeN_openrouter.py"]
+    A["Source manifest"] --> B["Image pool"]
+    B --> C["Captioning"]
+    C --> D["Human review"]
+    D --> E["Per-mode questions"]
+    E --> F["Model evaluation"]
     F --> G[("Result CSVs")]
 ```
 
-Every mode's evaluation script (`run_modeN_openrouter.py`) shares the same
-architecture against the OpenRouter API: threaded, concurrent requests; a
-resumable design that retries only unfinished or non-permanent-error tasks by
-task id, not restarting a run from scratch; base64-encoded local images sent
-as vision input; temperature 0; and a forced, single-word or single-letter
-output contract. What differs per mode is the prompt (see
-[Evaluation Prompts](#evaluation-prompts)) and the metric computed
-(PhD Index for base/sec/icc/ccs, CATR for sec/icc, MCDR/OEDR/UDR and
-false-abstention for nota).
+Every `run_modeN_openrouter.py` shares one architecture against the OpenRouter
+API: threaded, resumable, base64 image input, temperature 0, forced single-word/
+letter output. What differs per mode is the prompt and the metric (PhD Index,
+CATR, or MCDR/OEDR/UDR + false-abstention).
 
 ## Human Review
 
-Every image, together with its Arabic caption and hitem, passes through the
-review tool in `pipeline/review_ui/` before it is eligible to enter any mode's test
-set. The tool shows one candidate at a time (image, category, country metadata,
-Arabic caption and hitem text) and lets a reviewer approve, edit, or reject it in
-place; advancing without an explicit edit or rejection auto-approves the current
-record, and a rejected record is permanently excluded from the merged, promotable
-pool. This review process is applied uniformly by the project team across every
-one of the five modes' candidate data, not delegated to a single reviewer's slice
-of the pool.
+Every image, caption, and hitem passes through `pipeline/review_ui/` before
+entering any mode's test set: approve, edit, or reject, one candidate at a time.
+Skipping without action auto-approves; rejection is permanent.
 
 ```bash
-cd pipeline/review_ui
-python3 server.py --port 8765
-# open http://127.0.0.1:8765/
+cd pipeline/review_ui && python3 server.py --port 8765
 ```
 
 ## Setup
 
-1. `pip install -r requirements.txt` (only `requests`, plus `huggingface_hub` if
-   you are pulling the dataset straight from the Hub rather than a local copy).
-2. Get the data. The evaluation and pipeline scripts resolve it in this order:
-   - `SARAB_DATA_DIR` environment variable, if set, pointing at a local checkout.
-   - A sibling `Sarab-Dataset-HF/` directory next to this repo (useful for local
-     development against an unpublished or in-progress copy).
-   - Otherwise, downloaded and cached automatically from the Hugging Face dataset
-     (`HassanB4/sarab`) the first time a script runs.
-3. Copy `.env.template` to `.env` (repo root) and set `OPENROUTER_API_KEY`; every
-   mode's evaluation script authenticates against OpenRouter with this one key.
+1. `pip install -r requirements.txt`
+2. Data resolves via `SARAB_DATA_DIR`, else a sibling `Sarab-Dataset-HF/`, else
+   auto-download from the Hub (`HassanB4/sarab`).
+3. Copy `.env.template` → `.env`, set `OPENROUTER_API_KEY`.
 
 ## Reproducing an Evaluation Run
-
-Each mode's script shares the same `run` / `metrics` / `table` subcommand
-structure, threaded and resumable (retrying only unfinished or non-permanent-error
-tasks by task id, not restarting a run from scratch):
 
 ```bash
 python3 modes/mode1_base/run_mode1_openrouter.py run --run-label full --model google/gemini-2.5-flash
@@ -172,73 +113,53 @@ python3 modes/mode1_base/run_mode1_openrouter.py metrics
 python3 modes/mode1_base/run_mode1_openrouter.py table
 ```
 
-`--dry-run` builds the task list and prints counts with no API calls, useful for
-verifying the data path resolved correctly before spending anything on inference.
-The same pattern applies to `modes/mode2_sec`, `modes/mode3_icc`,
-`modes/mode4_ccs`, and `modes/mode5_nota`.
+`--dry-run` builds tasks with no API calls. Same pattern for modes 2-5.
 
 ## Evaluation Prompts
 
-The exact Arabic system instructions used by every mode, reproduced verbatim
-from the evaluation scripts. All are used at temperature 0 with a forced
-single-word or single-letter output contract.
+Temperature 0, forced single-word/letter output.
 
-**base and ccs** (no context text; ccs shares base's protocol exactly):
-
+**base / ccs** (no context; ccs shares base's protocol):
 ```
 انظر إلى الصورة وأجب عن السؤال بالاعتماد على ما هو ظاهر فيها. يجب أن تكون
 إجابتك كلمة واحدة فقط: نعم أو لا. لا تضف أي شرح أو علامات ترقيم أو كلمات أخرى.
 ```
 
-**sec and icc** (the base instruction above, plus one sentence verbatim from
-Liu et al.'s own sec/icc instruction; the misleading or incorrect Arabic
-caption is then prepended to the question):
-
+**sec / icc** (base instruction + one sentence from Liu et al.; caption prepended):
 ```
 ...لا تضف أي شرح أو علامات ترقيم أو كلمات أخرى. في حال وجود تعارض بين السياق
 النصي المرفق ومحتوى الصورة، اعتمد على الصورة.
 ```
 
-**nota**, a shared base instruction plus a per-condition instruction:
-
+**nota** (shared base + per-condition):
 ```
 # shared:
 انظر إلى الصورة وأجب عن السؤال بالاعتماد على ما هو ظاهر فيها.
-
-# MCDR / UDR / matched control (lettered multiple choice):
+# MCDR / UDR / control:
 أجب بحرف لاتيني واحد فقط يطابق الخيار الصحيح، دون أي شرح أو علامات ترقيم.
-
-# OEDR (no options shown):
+# OEDR:
 أجب عن السؤال بإجابة واحدة مختصرة. إن لم تكن متأكدًا من وجود إجابة صحيحة
 تتوافق مع الصورة، يمكنك القول: "لا يوجد خيار صحيح".
 ```
 
-The NOTA option text shown as a lettered choice under MCDR and the matched
-control is `لا توجد إجابة صحيحة`, deliberately a different phrase from the
-OEDR instruction's `لا يوجد خيار صحيح`; the two are not normalized into one
-phrase, so a model's response cannot simply pattern-match the instruction
-text back at the evaluator. The full worked example (a nota item under all
-three conditions plus its matched control) is in the paper (see
-[Citation](#citation)).
+MCDR's NOTA option (`لا توجد إجابة صحيحة`) is deliberately worded differently
+from OEDR's abstention phrase (`لا يوجد خيار صحيح`), so a model can't just
+pattern-match the instruction back. Worked examples are in the paper.
 
 ## Data
 
-The dataset (images, captions, hitems, per-mode question sets, and result CSVs) is
-released on Hugging Face at
-[`HassanB4/sarab`](https://huggingface.co/datasets/HassanB4/sarab) under
-CC-BY 4.0. Each image also carries its own source license (a mix of MIT,
-Apache-2.0, CC0, CC-BY, and CC-BY-SA, from Kaggle collections, The Metropolitan
-Museum of Art's Open Access API, and Wikimedia Commons), recorded per-record in the
-dataset. See the dataset card for the full per-mode JSON schema.
+Released on Hugging Face at
+[`HassanB4/sarab`](https://huggingface.co/datasets/HassanB4/sarab), CC-BY 4.0.
+Each image also carries its own source license (Kaggle, Met Open Access,
+Wikimedia Commons), recorded per-record.
 
 ## Results
 
-Full per-mode results across all four evaluated models (Gemini 2.5 Flash, Gemini
-2.5 Flash Lite, GPT-4o-mini, Qwen2.5-VL-72B-Instruct). PhD Index is the harmonic
-mean of yes-recall and no-recall (an all-yes or all-no model scores 0, random
-guessing scores about 0.5).
+Four models: Gemini 2.5 Flash, Gemini 2.5 Flash Lite, GPT-4o-mini,
+Qwen2.5-VL-72B. PhD Index = harmonic mean of yes-/no-recall (0 = all-yes/no,
+~0.5 = random).
 
-**base** (100 tasks, 50-image subset of the full 270-image pool):
+**base** (100 tasks, 50-image subset):
 
 | Model | Acc. | Yes-r. | No-r. | PhD Idx | Yes-bias |
 |---|---|---|---|---|---|
@@ -274,7 +195,7 @@ guessing scores about 0.5).
 | GPT-4o-mini | 83% | 93% | 73% | 0.821 | 60% |
 | Gemini 2.5 Flash Lite | 73% | 73% | 73% | 0.733 | 50% |
 
-**nota** (30 images, 120 records: 30 × mcdr/oedr/udr + matched control):
+**nota** (30 images, 120 records):
 
 | Model | MCDR | OEDR | UDR | False-abstention |
 |---|---|---|---|---|
@@ -283,67 +204,56 @@ guessing scores about 0.5).
 | Qwen2.5-VL-72B | 7% | 87% | 0% | 43% |
 | Gemini 2.5 Flash Lite | 7% | 83% | 0% | 30% |
 
-UDR is a flat 0 percent for every model, verified at the raw-response level: all
-120 responses are exactly a single letter (A, B, or C), fully compliant with the
-instruction and never volunteering that none of the options fit. Detection rises
-sharply once a model is explicitly invited to say so (MCDR, OEDR), but
-Qwen2.5-VL-72B's 43 percent false-abstention rate shows a meaningful share of that
-apparent detection is reflexive over-abstention rather than genuine recognition.
+UDR is 0% for every model, verified response-by-response: fully compliant,
+single-letter, never volunteering "none fit." Qwen's 43% false-abstention rate
+means much of its apparent MCDR/OEDR detection is reflexive over-abstention, not
+genuine recognition. Full analysis in the paper.
 
-Full analysis, per-category ccs breakdown, and the evaluation prompts are in the
-paper (see [Citation](#citation)).
+## Error Analysis & Ablation
+
+```bash
+python3 analysis/category_error_analysis.py                       # per-category breakdown, every mode
+python3 analysis/ablation_anti_trust_instruction.py smoke-test    # 1 real call, prints exact cost
+python3 analysis/ablation_anti_trust_instruction.py run           # new calls, "without instruction" arm
+python3 analysis/ablation_anti_trust_instruction.py compare       # with-vs-without table
+```
+
+`category_error_analysis.py` reproduces the paper's ccs per-category table
+exactly, as a sanity check, and extends the same breakdown to base/sec/icc/nota.
+
+`ablation_anti_trust_instruction.py` tests sec/icc's anti-trust sentence
+("follow the image if text and image conflict") by removing it and comparing
+against published results. Small pilot (20 tasks/model/mode): only hurt Gemini
+2.5 Flash (-5pp sec, -15pp icc) and Qwen (-5pp icc); GPT-4o-mini and Flash Lite
+unaffected. Full discussion in the paper.
 
 ## Limitations
 
-- **Four of eight proposed models.** The original proposal scoped eight models,
-  three Arabic-centric (AIN, Fanar, ALLaM) and five general-purpose (GPT-4o, Claude
-  3.7 Sonnet, Gemini 2.0 Pro, LLaVA-OneVision, InternVL-2.5). Results here cover
-  four different models reachable through a single OpenRouter key; none of the
-  Arabic-centric models, arguably the most important comparison for the proposal's
-  cultural-specialization hypotheses, have been evaluated yet.
-- **Image count discrepancy.** The reviewed, captioned pool that every mode's
-  questions are built from contains 281 images. A separate internal progress
-  report states 597, and the raw image directory (including sourcing candidates
-  that did not pass review) contains 604 files. These have not been reconciled;
-  281 is the figure that maps to captioned, question-eligible content.
-  Approximate per-category split: architecture 80, attire 21, cuisine 88, objects
-  2, script 90.
-- **base is evaluated on a subset.** Its result files are named as though they
-  cover the full pool but contain 100 tasks (a common 50-image subset), not all
-  540 questions across the full 270-image pool.
-  Evaluating the remaining 170 images is the most direct next step for that mode.
-- **nota's design changed after its specification was written.** The written spec
-  describes selecting 100 unique-identity items; the version actually generated
-  and evaluated has 30, rebuilt from the 50 sec/icc candidates not exported into
-  either mode's test set, deduplicated by unique identity. The 30-item set is what
-  is reported throughout; the 100-item design is superseded, not silently dropped.
-- **One model's nota result count does not match the others.** Three of four
-  models' nota result files have exactly 120 rows, matching the question set.
-  Qwen2.5-VL-72B's has 123, most likely un-deduplicated retries from a resumed run.
-  We compute its metrics from the actual 123-row file rather than forcing a false
-  parity across models.
-- **Format and pretraining exposure.** Following PhD's own framing, base, sec,
-  icc, and ccs use a binary yes/no format rather than free-form reasoning, and
-  images are drawn from generally available sources some evaluated models may have
-  encountered during pretraining; this isolates hallucination from raw
-  incapability rather than eliminating all possible prior exposure.
+- **Four of eight models.** Three Arabic-centric (AIN, Fanar, ALLaM) and five
+  general-purpose (GPT-4o, Claude 3.7 Sonnet, Gemini 2.0 Pro, LLaVA-OneVision,
+  InternVL-2.5) not yet evaluated.
+- **Image count discrepancy.** 281 captioned images; an internal report says
+  597, the raw directory has 604. Unreconciled; 281 is what maps to
+  question-eligible content.
+- **base is a subset.** 100 tasks (50-image subset), not the full 540 questions
+  across 270 images.
+- **nota's design changed.** Spec called for 100 items; 30 were built and
+  evaluated, rebuilt from sec/icc leftovers.
+- **One nota result file mismatches.** Qwen's has 123 rows, not 120; computed
+  as-is rather than forced to match.
+- **Format/pretraining exposure.** base/sec/icc/ccs use binary yes/no rather
+  than free-form reasoning; images may have appeared in pretraining data.
 
 ## Acknowledgements
 
-We thank the reviewers of the original Sarab proposal for their feedback on the
-benchmark's design, and acknowledge the openly licensed image sources used
-throughout: Kaggle collections, The Metropolitan Museum of Art's Open Access API,
-and Wikimedia Commons. Sarab's base/sec/icc/ccs modes are modeled on Liu et al.'s
-PhD benchmark (CVPR 2025); its nota mode adapts the absent-answer-detection
-protocol from Wang et al. (2026) and the Unsolvable Problem Detection methodology
-from Miyai et al. (ACL 2025).
+Thanks to the reviewers of the original Sarab proposal, and to the image sources
+(Kaggle, Met Open Access, Wikimedia Commons). base/sec/icc/ccs are modeled on
+Liu et al.'s PhD benchmark (CVPR 2025); nota adapts Wang et al. (2026) and
+Miyai et al.'s Unsolvable Problem Detection (ACL 2025).
 
 ## Citation
 
-The full system-description paper, including per-category ccs analysis, the
-complete evaluation prompts, and the human review methodology, is in preparation.
-This entry will be replaced with the paper's own citation once it is available;
-in the meantime, please cite the repository directly:
+Paper in preparation; cite the repo until it's out:
 
 ```bibtex
 @misc{sarab2026,
@@ -357,6 +267,5 @@ in the meantime, please cite the repository directly:
 
 ## License
 
-Code is released under the [MIT License](LICENSE). Each image in the dataset
-carries its own source license (see [Data](#data)); the dataset's own annotations
-(captions, hitems, questions) are released under CC-BY 4.0.
+Code: [MIT](LICENSE). Dataset annotations: CC-BY 4.0. Each image carries its own
+source license (see [Data](#data)).
