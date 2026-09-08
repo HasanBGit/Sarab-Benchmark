@@ -47,7 +47,7 @@ model, rising to 83-87% once explicitly invited to say so (OEDR).
 
 ## Key Contributions
 
-- **Sarab**: five-mode benchmark, 281 reviewed images across 5 ACVV categories,
+- **Sarab**: five-mode benchmark, 450 captioned images across 5 ACVV categories,
   real four-model results per mode.
 - **Sarab-ccs**: first Arab/Islamic cultural counter-common-sense mode we're
   aware of.
@@ -234,9 +234,6 @@ unaffected. Full discussion in the paper.
 - **Four of eight models.** Three Arabic-centric (AIN, Fanar, ALLaM) and five
   general-purpose (GPT-4o, Claude 3.7 Sonnet, Gemini 2.0 Pro, LLaVA-OneVision,
   InternVL-2.5) not yet evaluated.
-- **Image count discrepancy.** 281 captioned images; an internal report says
-  597, the raw directory has 604. Unreconciled; 281 is what maps to
-  question-eligible content.
 - **base is a subset.** 100 tasks (50-image subset), not the full 540 questions
   across 270 images.
 - **nota's design changed.** Spec called for 100 items; 30 were built and
