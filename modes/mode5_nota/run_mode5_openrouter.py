@@ -75,10 +75,12 @@ NOTA_FILE = DATA_ROOT / "modes" / "mode5_nota" / "sarab_nota_questions.json"
 RESULTS_DIR = HERE / "mode5_results"
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
+HUMAIN_API_URL = "https://api.node.humain.com/v1/chat/completions"
 
 TEMPERATURE = 0
 PROMPT_VERSION = 1
 DEFAULT_MODEL = "google/gemini-2.5-flash"
+HUMAIN_DEFAULT_MODEL = "humain-m3-preview"  # text-only on Node today -- see --blind
 MAX_OUTPUT_TOKENS = 64
 FALLBACK_MAX_TOKENS = 512
 NOTA_TEXT = "لا توجد إجابة صحيحة"
@@ -99,7 +101,7 @@ FIELDNAMES = [
     "task_id", "image_id", "condition", "structure_id", "is_control",
     "question_text", "options_shown", "correct_letter", "raw_response",
     "parsed_letter", "is_correct", "error_type", "detail", "attempts",
-    "latency_s", "model_name", "provider", "reasoning_disabled",
+    "latency_s", "model_name", "provider", "modality", "reasoning_disabled",
     "prompt_version", "temperature", "timestamp",
 ]
 PERMANENT_ERRORS = {"image_load_error", "safety_block", "api_error_400", "api_error_403"}
@@ -110,9 +112,24 @@ def load_records():
     return json.loads(NOTA_FILE.read_text(encoding="utf-8"))
 
 
+# One nota image_id doesn't match its source candidate-pool id verbatim --
+# a pre-existing truncation in sarab_nota_questions.json ("doll_s_...royal_d")
+# vs. the pool's real id ("dolls_...royal_dress"), confirmed to be the same
+# 86125_Palestinian_Doll_s_Thob_al_Malek_Royal_D.jpg image (the only mismatch
+# among all 30 nota images -- verified by diffing every nota id against both
+# candidate pools). Without this alias, preflight silently drops all 4 of
+# that image's tasks (mcdr/oedr/udr/control) as "missing", regardless of
+# which model is being evaluated.
+IMAGE_ID_ALIASES = {
+    "attire_86125_palestinian_doll_s_thob_al_malek_royal_d":
+        "attire_86125_palestinian_dolls_thob_al_malek_royal_dress",
+}
+
+
 def resolve_image_path(image_id):
     """nota records don't carry local_path themselves -- look it up from the
     two mode2/mode3 candidate pools they were sourced from."""
+    image_id = IMAGE_ID_ALIASES.get(image_id, image_id)
     for f in ("modes/mode2_sec/candidate_pool_sec.json", "modes/mode3_icc/candidate_pool_icc.json"):
         for r in json.loads((DATA_ROOT / f).read_text(encoding="utf-8")):
             if r["image_id"] == image_id:
@@ -147,8 +164,9 @@ def preflight(tasks):
     return tasks
 
 
-def load_api_key():
-    key = os.environ.get("OPENROUTER_API_KEY")
+def load_api_key(provider="openrouter"):
+    env_var = "OPENROUTER_API_KEY" if provider == "openrouter" else "HUMAIN_NODE_API_KEY"
+    key = os.environ.get(env_var)
     if key:
         return key.strip()
     env_path = REPO_ROOT / ".env"
@@ -158,9 +176,9 @@ def load_api_key():
             if not line or line.startswith("#") or "=" not in line:
                 continue
             k, _, v = line.partition("=")
-            if k.strip() == "OPENROUTER_API_KEY":
+            if k.strip() == env_var:
                 return v.strip().strip('"').strip("'")
-    raise SystemExit("OPENROUTER_API_KEY not found. export it or add it to a .env file at the repo root.")
+    raise SystemExit(f"{env_var} not found. export it or add it to a .env file at the repo root.")
 
 
 def guess_mime(path):
@@ -246,31 +264,42 @@ def score(task, raw):
 
 
 # ---------------------------------------------------------------------------
-def call_model(session, api_key, model, image_path, system, prompt_text, max_tokens, reasoning_off, timeout):
-    with open(image_path, "rb") as fh:
-        img_bytes = fh.read()
-    data_uri = f"data:{guess_mime(image_path)};base64,{base64.b64encode(img_bytes).decode('ascii')}"
+def call_model(session, api_key, model, image_path, system, prompt_text, max_tokens, reasoning_off, timeout,
+                provider="openrouter", blind=False):
+    if blind:
+        user_content = prompt_text
+    else:
+        with open(image_path, "rb") as fh:
+            img_bytes = fh.read()
+        data_uri = f"data:{guess_mime(image_path)};base64,{base64.b64encode(img_bytes).decode('ascii')}"
+        user_content = [
+            {"type": "text", "text": prompt_text},
+            {"type": "image_url", "image_url": {"url": data_uri}},
+        ]
     payload = {
         "model": model, "temperature": TEMPERATURE, "max_tokens": max_tokens,
         "messages": [
             {"role": "system", "content": system},
-            {"role": "user", "content": [
-                {"type": "text", "text": prompt_text},
-                {"type": "image_url", "image_url": {"url": data_uri}},
-            ]},
+            {"role": "user", "content": user_content},
         ],
     }
     if reasoning_off:
         payload["reasoning"] = {"enabled": False}
-    headers = {
-        "Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/HasanBGit/Sarab-Benchmark",
-        "X-Title": "Sarab Mode 5 (nota) evaluation",
-    }
-    return session.post(API_URL, headers=headers, json=payload, timeout=timeout)
+    if provider == "humain":
+        url = HUMAIN_API_URL
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    else:
+        url = API_URL
+        headers = {
+            "Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/HasanBGit/Sarab-Benchmark",
+            "X-Title": "Sarab Mode 5 (nota) evaluation",
+        }
+    return session.post(url, headers=headers, json=payload, timeout=timeout)
 
 
-def mk_result(task, model, raw, parsed_letter, is_correct, error_type, detail, attempts, latency, reasoning_off, options_shown):
+def mk_result(task, model, raw, parsed_letter, is_correct, error_type, detail, attempts, latency, reasoning_off,
+              options_shown, provider="openrouter", blind=False):
     return {
         "task_id": task["task_id"], "image_id": task["image_id"], "condition": task["condition"],
         "structure_id": task["structure_id"], "is_control": int(task["is_control"]),
@@ -278,15 +307,18 @@ def mk_result(task, model, raw, parsed_letter, is_correct, error_type, detail, a
         "correct_letter": correct_letter_for(task) or "", "raw_response": raw,
         "parsed_letter": parsed_letter or "", "is_correct": is_correct,
         "error_type": error_type, "detail": detail, "attempts": attempts, "latency_s": latency,
-        "model_name": model, "provider": "openrouter", "reasoning_disabled": int(reasoning_off),
+        "model_name": model, "provider": provider, "modality": "text_only" if blind else "vision",
+        "reasoning_disabled": int(reasoning_off),
         "prompt_version": PROMPT_VERSION, "temperature": TEMPERATURE,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 
-def run_one_task(session, api_key, model, task, min_gap, max_retries, state, last_call):
-    if not task["image_path"] or not os.path.isfile(task["image_path"]):
-        return mk_result(task, model, "", None, 0, "image_load_error", "file not found", 0, 0.0, True, "")
+def run_one_task(session, api_key, model, task, min_gap, max_retries, state, last_call,
+                  provider="openrouter", blind=False):
+    if not blind and (not task["image_path"] or not os.path.isfile(task["image_path"])):
+        return mk_result(task, model, "", None, 0, "image_load_error", "file not found", 0, 0.0, True, "",
+                          provider, blind)
 
     system, prompt_text, options_shown = build_prompt(task)
     reasoning_off = state.get(model, True)
@@ -298,12 +330,14 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
         t0 = time.time()
         last_call[0] = t0
         try:
-            resp = call_model(session, api_key, model, task["image_path"], system, prompt_text, max_tokens, reasoning_off, timeout=60)
+            resp = call_model(session, api_key, model, task["image_path"], system, prompt_text, max_tokens,
+                               reasoning_off, timeout=60, provider=provider, blind=blind)
         except requests.RequestException as e:
             if attempt < max_retries:
                 time.sleep(min(2 ** attempt, 30) + random.uniform(0, 1))
                 continue
-            return mk_result(task, model, "", None, 0, "exception", str(e)[:200], attempt, round(time.time() - t0, 2), reasoning_off, options_shown)
+            return mk_result(task, model, "", None, 0, "exception", str(e)[:200], attempt,
+                              round(time.time() - t0, 2), reasoning_off, options_shown, provider, blind)
 
         latency = round(time.time() - t0, 2)
 
@@ -316,17 +350,21 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
                 state[model] = False
                 reasoning_off = False
                 continue
-            return mk_result(task, model, "", None, 0, "api_error_400", msg[:200], attempt, latency, reasoning_off, options_shown)
+            return mk_result(task, model, "", None, 0, "api_error_400", msg[:200], attempt, latency,
+                              reasoning_off, options_shown, provider, blind)
         if resp.status_code == 403:
-            return mk_result(task, model, "", None, 0, "api_error_403", resp.text[:200], attempt, latency, reasoning_off, options_shown)
+            return mk_result(task, model, "", None, 0, "api_error_403", resp.text[:200], attempt, latency,
+                              reasoning_off, options_shown, provider, blind)
         if resp.status_code == 429 or 500 <= resp.status_code < 600:
             if attempt < max_retries:
                 time.sleep(min(2 ** attempt, 30) + random.uniform(0, 1))
                 continue
             et = "rate_limited" if resp.status_code == 429 else f"server_error_{resp.status_code}"
-            return mk_result(task, model, "", None, 0, et, resp.text[:200], attempt, latency, reasoning_off, options_shown)
+            return mk_result(task, model, "", None, 0, et, resp.text[:200], attempt, latency,
+                              reasoning_off, options_shown, provider, blind)
         if resp.status_code != 200:
-            return mk_result(task, model, "", None, 0, f"api_error_{resp.status_code}", resp.text[:200], attempt, latency, reasoning_off, options_shown)
+            return mk_result(task, model, "", None, 0, f"api_error_{resp.status_code}", resp.text[:200],
+                              attempt, latency, reasoning_off, options_shown, provider, blind)
 
         data = resp.json()
         choice = (data.get("choices") or [{}])[0]
@@ -337,12 +375,15 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
             if not blocked and finish_reason == "length" and reasoning_off and attempt < max_retries:
                 reasoning_off = False
                 continue
-            return mk_result(task, model, "", None, 0, "safety_block" if blocked else "empty_response", finish_reason, attempt, latency, reasoning_off, options_shown)
+            return mk_result(task, model, "", None, 0, "safety_block" if blocked else "empty_response",
+                              finish_reason, attempt, latency, reasoning_off, options_shown, provider, blind)
 
         parsed_letter, is_correct = score(task, raw)
-        return mk_result(task, model, raw, parsed_letter, is_correct, "", "", attempt, latency, reasoning_off, options_shown)
+        return mk_result(task, model, raw, parsed_letter, is_correct, "", "", attempt, latency, reasoning_off,
+                          options_shown, provider, blind)
 
-    return mk_result(task, model, "", None, 0, "exhausted_retries", "", max_retries, 0.0, reasoning_off, options_shown)
+    return mk_result(task, model, "", None, 0, "exhausted_retries", "", max_retries, 0.0, reasoning_off,
+                      options_shown, provider, blind)
 
 
 def is_final(row):
@@ -350,20 +391,27 @@ def is_final(row):
 
 
 def cmd_run(args):
+    if args.model is None:
+        args.model = HUMAIN_DEFAULT_MODEL if args.provider == "humain" else DEFAULT_MODEL
+    if args.provider == "humain" and not args.blind:
+        args.blind = True
+        print("note: HUMAIN Node has no vision-capable model yet -- forcing --blind (text-only, no image sent).")
+
     records = load_records()
     tasks = build_tasks(records, args.limit)
     preflight(tasks)
 
     model_slug = re.sub(r"[^a-z0-9.]+", "-", args.model.lower())
+    blind_suffix = "_blind" if args.blind else ""
     RESULTS_DIR.mkdir(exist_ok=True)
-    out_path = Path(args.out) if args.out else RESULTS_DIR / f"results_mode5_{model_slug}.csv"
+    out_path = Path(args.out) if args.out else RESULTS_DIR / f"results_mode5_{model_slug}{blind_suffix}.csv"
 
-    print(f"model={args.model} tasks={len(tasks)} out={out_path}")
+    print(f"provider={args.provider} model={args.model} blind={args.blind} tasks={len(tasks)} out={out_path}")
     if args.dry_run:
         print("dry run — no API calls made.")
         return
 
-    api_key = load_api_key()
+    api_key = load_api_key(args.provider)
     done = set()
     if out_path.is_file():
         with open(out_path, newline="", encoding="utf-8") as fh:
@@ -391,7 +439,8 @@ def cmd_run(args):
             last_call = [0.0]
             consec_rate_limited = 0
             for i, task in enumerate(todo, 1):
-                res = run_one_task(session, api_key, args.model, task, args.min_gap, args.max_retries, state, last_call)
+                res = run_one_task(session, api_key, args.model, task, args.min_gap, args.max_retries, state, last_call,
+                                    provider=args.provider, blind=args.blind)
                 writer.writerow(res)
                 fh.flush()
                 status = f"{res['parsed_letter']}({res['is_correct']})" if not res["error_type"] else f"⚠️{res['error_type']}"
@@ -409,7 +458,8 @@ def cmd_run(args):
             rate_limited_count = 0
 
             def _worker(task):
-                return run_one_task(session, api_key, args.model, task, 0.0, args.max_retries, state, [0.0])
+                return run_one_task(session, api_key, args.model, task, 0.0, args.max_retries, state, [0.0],
+                                     provider=args.provider, blind=args.blind)
 
             with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
                 futures = {pool.submit(_worker, t): t for t in todo}
@@ -456,8 +506,12 @@ def compute_metrics(path):
 
     model_names = {r.get("model_name") for r in rows if r.get("model_name")}
     errs = Counter(r["error_type"] for r in rows if r["error_type"])
+    modalities = {r.get("modality") for r in rows if r.get("modality")}
+    display_name = next(iter(model_names), "?") if len(model_names) == 1 else "/".join(sorted(model_names))
+    if modalities == {"text_only"}:
+        display_name += " (blind/no-image)"
     return {
-        "path": path, "model_name": next(iter(model_names), "?") if len(model_names) == 1 else "/".join(sorted(model_names)),
+        "path": path, "model_name": display_name,
         "n_total": len(rows), "n_errors": sum(errs.values()),
         "mcdr": mcdr_core, "n_mcdr": n_mcdr, "oedr": oedr_core, "n_oedr": n_oedr, "udr": udr_core, "n_udr": n_udr,
         "false_abstention": false_abstention, "n_control": n_control, "error_types": dict(errs),
@@ -507,7 +561,11 @@ def main():
     sub = p.add_subparsers(dest="command", required=True)
 
     r = sub.add_parser("run")
-    r.add_argument("--model", default=DEFAULT_MODEL)
+    r.add_argument("--provider", choices=["openrouter", "humain"], default="openrouter")
+    r.add_argument("--model", default=None,
+                    help=f"model slug (default: {DEFAULT_MODEL} for openrouter, {HUMAIN_DEFAULT_MODEL} for humain)")
+    r.add_argument("--blind", action="store_true",
+                    help="text-only ablation: no image sent (auto-enabled for --provider humain)")
     r.add_argument("--limit", type=int, default=None)
     r.add_argument("--out", default=None)
     r.add_argument("--min-gap", type=float, default=1.0)
