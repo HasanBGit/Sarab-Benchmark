@@ -56,7 +56,7 @@ all other metrics are in the paper.
 | GLM-5.3-Flash (`z-ai/glm-5.3-flash`) | 80.7 | 50.0 | 68.0 | 86.7 |
 
 A misleading or wrong caption separates the models much more than plain
-recognition does. The logged spend for the run was about $5.64.
+recognition does.
 
 ## Repository Structure
 
