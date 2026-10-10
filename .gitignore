@@ -26,5 +26,3 @@ modes/results_summary.*
 # personal to-do list
 TODO_LATER.md
 
-# paper analysis scripts, labels, and outputs: kept local for now
-analysis/

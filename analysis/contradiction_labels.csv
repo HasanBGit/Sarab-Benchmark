@@ -1,0 +1,78 @@
+model,task_id,label,labelled_by,second_pass
+Gemini 2.5 Flash,image_178A;image_178B__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_216A;image_216B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_258A;image_258B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_480__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_524__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_537__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_571__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,image_552__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,cuisine_cuisine_of_egypt_07__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,objects_447019_pierced_globe__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,script_thuluth_5_169__no,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Gemini 2.5 Flash,architecture_king_abdullah_financial_district_kafd_k13__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Gemini 2.5 Flash,architecture_al_masmak_palace_masmak_12__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Gemini 2.5 Flash,architecture_ibrahim_palace_screenshot_2023_11_16_093223__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Gemini 2.5 Flash,architecture_kingdom_tower_mam_11__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Gemini 2.5 Flash,architecture_kingdom_tower_mam_1__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Gemini 2.5 Flash,architecture_al_masmak_palace_masmak_11__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Gemini 2.5 Flash,architecture_kingdom_tower_mam_10__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+GPT-5 mini,image_109A;image_109B__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GPT-5 mini,image_169A;image_169B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GPT-5 mini,image_185A;image_185B__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GPT-5 mini,image_480__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GPT-5 mini,architecture_ibrahim_palace_screenshot_2023_11_16_093255__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GPT-5 mini,architecture_the_clock_towers_watch_11__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+GPT-5 mini,architecture_quba_mosque_quba_11__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_135A;image_135B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_162A;image_162B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_160A;image_160B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_254A;image_254B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_258A;image_258B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_261A;image_261B__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_467__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_539__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,image_559__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,image_604__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,cuisine_cuisine_of_saudi_arabia_07__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,cuisine_cuisine_of_jordan_04__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,objects_striped_ceramic_teapot__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,cuisine_levantine_cuisine_01__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,objects_rehal_quran_stand__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,objects_qanun_zither__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,objects_fanous_ramadan_lantern__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,script_ruqah_ruq15__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,script_naskh_6_360__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Qwen2.5-VL-72B,architecture_ithra_screenshot_2023_10_31_111325__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,architecture_kingdom_tower_mam_10__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,architecture_the_kaaba_kabba_13__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,architecture_the_kaaba_kabba_11__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,script_kufic_kuf69__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Qwen2.5-VL-72B,cuisine_cuisine_of_egypt_11__yes,TRUE,"assistant (read all 77, single pass); needs a human check","BORDERLINE (the no may refer to 'Egyptian', not the dish)"
+Qwen2.5-VL-72B,cuisine_cuisine_of_saudi_arabia_12__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Muse Glimmer 30B,image_257A;image_257B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Muse Glimmer 30B,image_472__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Muse Glimmer 30B,architecture_al_rahmah_mosque_m1__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Muse Glimmer 30B,architecture_al_rahmah_mosque_m11__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Muse Glimmer 30B,architecture_jabal_alfil_elephant_rock_elephant_10__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Muse Glimmer 30B,cuisine_cuisine_of_jordan_04__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Muse Glimmer 30B,cuisine_cuisine_of_saudi_arabia_10__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Muse Glimmer 30B,architecture_al_rahmah_mosque_m13__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Muse Glimmer 30B,architecture_al_masmak_palace_masmak_1__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Muse Glimmer 30B,architecture_kingdom_tower_mam_10__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Muse Glimmer 30B,architecture_maraya_mirror_11__yes,TRUE,"assistant (read all 77, single pass); needs a human check",CONFIRMED
+Mistral Large 4,image_258A;image_258B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,image_571__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,script_naskh_naskh17__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,script_naskh_6_360__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,script_diwani_6_489__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,script_thuluth_2_160__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,script_diwani_6_655__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,script_thuluth_5_169__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+Mistral Large 4,cuisine_cuisine_of_saudi_arabia_06__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GLM-5.3-Flash,image_165A;image_165B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GLM-5.3-Flash,image_249A;image_249B__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GLM-5.3-Flash,image_472__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GLM-5.3-Flash,image_555__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GLM-5.3-Flash,script_naskh_naskh18__yes,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE
+GLM-5.3-Flash,script_naskh_naskh13__no,FALSE,"assistant (read all 77, single pass); needs a human check",CONFIRMED FALSE

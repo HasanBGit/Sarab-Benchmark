@@ -16,12 +16,6 @@ pipeline, per-mode evaluation scripts, the batch runner, and the review UI.
 The dataset (images, captions, questions) lives on Hugging Face; see
 [Data](#data). The model replies from the full run are not uploaded yet.
 
-## Authors
-
-Zahra Alharz (Imam Abdulrahman Bin Faisal University), Hassan Barmandah (Umm
-Al-Qura University), Abdulrahman Khalid Ahmed Ali (King Khalid University), Saad Saeed
-Alahmari (PI, Najran University, corresponding author, ssalahmari@nu.edu.sa)
-
 ---
 
 <p align="center"><img src="assets/sarab_overview.png" alt="Sarab overview: one item from each of the five modes" width="900"></p>
