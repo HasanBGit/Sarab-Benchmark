@@ -6,14 +6,20 @@ mcdr/oedr/udr + control). Three different prompt/response formats per
 condition, matching nota_question_prompt.md and Wang et al. 2026's
 MCDR/OEDR/UDR protocol:
 
-  mcdr / control -- options_ar shown as a lettered list (A-D, NOTA always
-    last). Model told to answer with exactly one Latin letter. Correct
-    letter is derived per-record (whichever option isn't a listed
-    distractor and isn't the NOTA text), not hardcoded to "D"/"C" -- so a
-    reordering of the source data doesn't silently break scoring.
+  Prompt version 2: every condition now asks for the answer FIRST and then a
+  ~30-word Arabic explanation (same style as modes 1-4). Only the answer part
+  is scored (see parse_letter / oedr_answer). Version 1 (answer only, no
+  explanation, options never shuffled) results are in mode5_results/old/.
+
+  mcdr / control -- options_ar shown as a lettered list (A-D). The option
+    order is shuffled per task with a seed derived from the task_id, so the
+    correct letter (and NOTA) does not sit in a fixed slot. Model told to
+    start with exactly one Latin letter. Correct letter is derived
+    per-task from the shuffled options (whichever option isn't a listed
+    distractor and isn't the NOTA text), never hardcoded.
 
   udr -- 3 real distractor options (A-C) shown as an ordinary-looking MCQ,
-    with the SAME rigid "answer one letter only" instruction as mcdr --
+    with the SAME "start with one letter" instruction as mcdr --
     deliberately no escape hatch. Wang et al.'s UDR condition tests
     whether a model spontaneously breaks that instruction to flag nothing
     fits; softening the instruction here would just turn it into OEDR.
@@ -22,9 +28,13 @@ MCDR/OEDR/UDR protocol:
 
   oedr -- no options shown at all, free-text answer, task-level permission
     stated once ("...you may say 'no correct option'"), per
-    nota_question_prompt.md. Scoring: fabricating one of the 3 distractors
-    verbatim = miss; anything else (a hedge, or genuinely naming the real
-    answer since the model can still see the image) = detected/correct.
+    nota_question_prompt.md. The model gives a short answer on the first line,
+    then an explanation. Scoring looks at the answer part ONLY (the first
+    line, cut at the first period or comma), because an explanation may
+    legitimately mention a distractor's name. Fabricating one of the 3
+    distractors verbatim in the answer = miss; anything else (a hedge, or
+    genuinely naming the real answer since the model can still see the
+    image) = detected/correct.
 
 Usage (run from modes/mode5_nota/, or anywhere -- paths resolve from repo root):
     export OPENROUTER_API_KEY=sk-or-...
@@ -44,6 +54,7 @@ import random
 import re
 import threading
 import time
+import zlib
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -78,22 +89,27 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 HUMAIN_API_URL = "https://api.node.humain.com/v1/chat/completions"
 
 TEMPERATURE = 0
-PROMPT_VERSION = 1
+PROMPT_VERSION = 2
 DEFAULT_MODEL = "google/gemini-2.5-flash"
 HUMAIN_DEFAULT_MODEL = "humain-m3-preview"  # text-only on Node today -- see --blind
-MAX_OUTPUT_TOKENS = 64
-FALLBACK_MAX_TOKENS = 512
+MAX_OUTPUT_TOKENS = 256
+FALLBACK_MAX_TOKENS = 4096
 NOTA_TEXT = "لا توجد إجابة صحيحة"
+NO_OPTIONS_LABEL = "(none shown: open-ended)"  # OEDR shows no options; keep the CSV cell non-empty
 LETTERS = ["A", "B", "C", "D"]
 
 BASE_INSTRUCTION_AR = "انظر إلى الصورة وأجب عن السؤال بالاعتماد على ما هو ظاهر فيها."
-MCQ_INSTRUCTION_AR = "أجب بحرف لاتيني واحد فقط يطابق الخيار الصحيح، دون أي شرح أو علامات ترقيم."
+MCQ_INSTRUCTION_AR = (
+    "ابدأ إجابتك بحرف لاتيني واحد فقط يطابق الخيار الصحيح، "
+    "ثم اشرح في نحو 30 كلمة لماذا اخترت هذا الخيار."
+)
 # Verbatim from nota_question_prompt.md's OEDR section -- deliberately a
 # different phrase from NOTA_TEXT (the MCDR option string): "لا يوجد خيار
 # صحيح" here, not "لا توجد إجابة صحيحة". Match the doc exactly, don't
 # normalize the two into one phrase.
 OEDR_INSTRUCTION_AR = (
-    "أجب عن السؤال بإجابة واحدة مختصرة. إن لم تكن متأكدًا من وجود إجابة صحيحة "
+    "ابدأ بإجابة واحدة مختصرة في سطر واحد، ثم اشرح في سطر جديد في نحو 30 كلمة "
+    "لماذا اخترت هذه الإجابة. إن لم تكن متأكدًا من وجود إجابة صحيحة "
     "تتوافق مع الصورة، يمكنك القول: \"لا يوجد خيار صحيح\"."
 )
 
@@ -147,6 +163,12 @@ def build_tasks(records, limit=None):
         task = dict(r)
         task["task_id"] = f"{iid}__{r['condition']}__{'control' if r['is_control'] else 'core'}"
         task["image_path"] = image_paths[iid]
+        if task.get("options_ar"):
+            # shuffle per task, deterministically (seed = task_id), so the
+            # correct letter / NOTA never sits in a fixed slot
+            opts = list(task["options_ar"])
+            random.Random(zlib.crc32(task["task_id"].encode("utf-8"))).shuffle(opts)
+            task["options_ar"] = opts
         tasks.append(task)
     if limit:
         tasks = tasks[:limit]
@@ -202,7 +224,7 @@ def build_prompt(task):
     else:  # oedr
         prompt = question
         system = f"{BASE_INSTRUCTION_AR} {OEDR_INSTRUCTION_AR}"
-        options_shown = ""
+        options_shown = NO_OPTIONS_LABEL
     return system, prompt, options_shown
 
 
@@ -227,17 +249,86 @@ def correct_letter_for(task):
 
 
 def parse_letter(raw):
+    """Prompt v2: the reply must START with the option letter, then explain.
+    Only the leading letter is read -- the explanation may contain stray
+    A-D tokens. A short 'Option B' / 'Answer: B' style lead-in is tolerated
+    (letter within the first 15 characters)."""
     if not raw:
         return None
-    text = raw.strip().strip(" \n\t\"'.,!?؟،؛:-")
-    m = re.match(r"^([A-Da-d])\b", text)
+    text = raw.strip().lstrip(" \n\t\"'.,!?؟،؛:-*#(")
+    m = re.match(r"^([A-Da-d])(?![A-Za-z])", text)
     if m:
         return m.group(1).upper()
-    # tolerate "Option A" / "الإجابة A" style wrapping without extra prose
-    m = re.search(r"\b([A-D])\b", text)
-    if m and len(text) <= 20:
+    m = re.search(r"\b([A-D])\b", text[:15])
+    if m:
         return m.group(1)
     return None
+
+
+def oedr_answer(raw):
+    """The answer part of an OEDR reply: first non-empty line, cut at the
+    first period or comma (the rest is the explanation)."""
+    for line in (raw or "").splitlines():
+        if line.strip():
+            return re.split(r"[.،]", line.strip())[0].strip()
+    return ""
+
+
+_AR_DIACRITICS = re.compile(r"[\u0610-\u061A\u064B-\u065F\u0670\u0640]")
+# generic building words that don't identify a landmark by themselves
+_GENERIC_WORDS = {"برج", "مبنى", "بناء", "مركز", "قصر", "قلعة", "حصن", "متحف", "مسجد", "جامع", "هذا", "هو"}
+
+
+def _norm_tokens(text):
+    """Arabic-normalised distinctive tokens: diacritics/tatweel dropped,
+    alef/ya/ta-marbuta variants unified, leading 'ال' stripped, generic
+    building words removed."""
+    text = _AR_DIACRITICS.sub("", text or "")
+    text = (text.replace("أ", "ا").replace("إ", "ا").replace("آ", "ا")
+                .replace("ى", "ي").replace("ة", "ه"))
+    toks = re.findall(r"[\u0621-\u064A]+|[A-Za-z]+", text)
+    out = set()
+    for t in toks:
+        if t in {_norm_one(g) for g in _GENERIC_WORDS}:
+            continue
+        out.add(t[2:] if t.startswith("ال") and len(t) > 3 else t)
+    return out
+
+
+def _norm_one(word):
+    return (_AR_DIACRITICS.sub("", word).replace("أ", "ا").replace("إ", "ا")
+            .replace("آ", "ا").replace("ى", "ي").replace("ة", "ه"))
+
+
+_STOP_TOKENS = {"في", "من", "الي", "علي", "هو", "هي", "هذا", "هذه", "الذي", "التي", "و"}
+
+
+def _name_tokens(text):
+    return {t for t in _norm_tokens(text) if t not in _STOP_TOKENS}
+
+
+def repeats_distractor(answer, distractor, all_distractors=()):
+    """True if the answer repeats the distractor: verbatim, or the same name after
+    Arabic normalisation (e.g. 'مبنى المملكة' repeats 'برج المملكة').
+    Fuzzy matches are deliberately narrow:
+      - every distinctive token of the distractor appears in the answer (a one-token
+        name such as 'المملكة' only counts for a very short answer, so a sentence
+        mentioning 'المملكة العربية السعودية' is not a repeat), or
+      - shorthand: every token of the answer is unique to this distractor among the
+        item's distractors ('مركز كافد' for the full KAFD name). A bare word shared
+        by several distractors ('ملوخية' in 'ملوخية فلسطينية') is not a repeat."""
+    if not distractor:
+        return False
+    if distractor in (answer or ""):
+        return True
+    d, a = _name_tokens(distractor), _name_tokens(answer)
+    if not d or not a:
+        return False
+    if d <= a:
+        return len(d) >= 2 or len(a) <= 2
+    others = [_name_tokens(x) for x in all_distractors if x and x != distractor]
+    unique = d - set().union(*others) if others else d
+    return a <= unique
 
 
 def score(task, raw):
@@ -255,9 +346,9 @@ def score(task, raw):
         return letter, int(letter is None)
 
     if cond == "oedr":
-        text = (raw or "").strip()
+        text = oedr_answer(raw)
         distractors = task.get("distractors_ar") or []
-        fabricated = any(d and d in text for d in distractors)
+        fabricated = any(repeats_distractor(text, d, distractors) for d in distractors)
         return None, int(bool(text) and not fabricated)
 
     return None, 0
@@ -298,19 +389,68 @@ def call_model(session, api_key, model, image_path, system, prompt_text, max_tok
     return session.post(url, headers=headers, json=payload, timeout=timeout)
 
 
+def label_no_letter(task, for_correct=False, error_type=""):
+    """Non-empty label for letter cells that have no letter, so the CSV has no
+    blank cells where a value is expected (error_type/detail stay blank on
+    success -- the scripts treat a non-empty value there as an error)."""
+    if for_correct:
+        return "n/a (open-ended)" if task["condition"] == "oedr" else "n/a (answer absent)"
+    if error_type:
+        return "n/a (error)"
+    return "n/a (open-ended)" if task["condition"] == "oedr" else "none (no letter given)"
+
+
+# Per-call logging added for analysis (cost, tokens, who served the call).
+# OpenRouter returns usage and cost on every response by default.
+META_FIELDS = ["finish_reason", "prompt_tokens", "completion_tokens", "reasoning_tokens", "cost_usd",
+               "generation_id", "served_by", "response_model", "max_tokens_sent"]
+NO_META = {k: "n/a (no response)" for k in META_FIELDS}
+FIELDNAMES = FIELDNAMES + META_FIELDS
+
+
+def extract_meta(data, max_tokens):
+    """Usage/cost/provenance fields from one chat-completions response."""
+    def v(x):
+        return "n/a (not reported)" if x in (None, "") else x
+    usage = data.get("usage") or {}
+    choice = (data.get("choices") or [{}])[0]
+    details = usage.get("completion_tokens_details") or {}
+    return {
+        "finish_reason": v(choice.get("finish_reason")), "prompt_tokens": v(usage.get("prompt_tokens")),
+        "completion_tokens": v(usage.get("completion_tokens")), "reasoning_tokens": v(details.get("reasoning_tokens")),
+        "cost_usd": v(usage.get("cost")), "generation_id": v(data.get("id")), "served_by": v(data.get("provider")),
+        "response_model": v(data.get("model")), "max_tokens_sent": max_tokens,
+    }
+
+
+def migrate_results_file(path):
+    """Bring an existing results CSV up to the current columns (older rows get a label)."""
+    with open(path, newline="", encoding="utf-8") as fh:
+        rd = csv.DictReader(fh)
+        old, rows = rd.fieldnames or [], list(rd)
+    if old == FIELDNAMES:
+        return
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=FIELDNAMES, restval="n/a (before logging)", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+
+
 def mk_result(task, model, raw, parsed_letter, is_correct, error_type, detail, attempts, latency, reasoning_off,
-              options_shown, provider="openrouter", blind=False):
+              options_shown, provider="openrouter", blind=False, meta=None):
     return {
         "task_id": task["task_id"], "image_id": task["image_id"], "condition": task["condition"],
         "structure_id": task["structure_id"], "is_control": int(task["is_control"]),
         "question_text": task.get("question_text") or task.get("question_ar"), "options_shown": options_shown,
-        "correct_letter": correct_letter_for(task) or "", "raw_response": raw,
-        "parsed_letter": parsed_letter or "", "is_correct": is_correct,
+        "correct_letter": correct_letter_for(task) or label_no_letter(task, for_correct=True),
+        "raw_response": raw,
+        "parsed_letter": parsed_letter or label_no_letter(task, error_type=error_type), "is_correct": is_correct,
         "error_type": error_type, "detail": detail, "attempts": attempts, "latency_s": latency,
         "model_name": model, "provider": provider, "modality": "text_only" if blind else "vision",
         "reasoning_disabled": int(reasoning_off),
         "prompt_version": PROMPT_VERSION, "temperature": TEMPERATURE,
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        **(meta or NO_META),
     }
 
 
@@ -322,11 +462,12 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
 
     system, prompt_text, options_shown = build_prompt(task)
     reasoning_off = state.get(model, True)
+    extra = 0  # doublings of the token budget after repeated 'length' cutoffs
     for attempt in range(1, max_retries + 1):
         gap = min_gap - (time.time() - last_call[0])
         if gap > 0:
             time.sleep(gap)
-        max_tokens = MAX_OUTPUT_TOKENS if reasoning_off else FALLBACK_MAX_TOKENS
+        max_tokens = (MAX_OUTPUT_TOKENS if reasoning_off else FALLBACK_MAX_TOKENS) * (2 ** extra)
         t0 = time.time()
         last_call[0] = t0
         try:
@@ -372,15 +513,21 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
         finish_reason = (choice.get("finish_reason") or "").lower()
         if not raw:
             blocked = any(k in finish_reason for k in ("content_filter", "safety"))
-            if not blocked and finish_reason == "length" and reasoning_off and attempt < max_retries:
-                reasoning_off = False
-                continue
+            if not blocked and finish_reason == "length" and attempt < max_retries:
+                # reasoning likely ate the whole budget: first stop forcing reasoning off,
+                # then keep doubling the token budget (up to 4x) before giving up
+                if reasoning_off:
+                    reasoning_off = False
+                    continue
+                if extra < 2:
+                    extra += 1
+                    continue
             return mk_result(task, model, "", None, 0, "safety_block" if blocked else "empty_response",
-                              finish_reason, attempt, latency, reasoning_off, options_shown, provider, blind)
+                              finish_reason, attempt, latency, reasoning_off, options_shown, provider, blind, meta=extract_meta(data, max_tokens))
 
         parsed_letter, is_correct = score(task, raw)
         return mk_result(task, model, raw, parsed_letter, is_correct, "", "", attempt, latency, reasoning_off,
-                          options_shown, provider, blind)
+                          options_shown, provider, blind, meta=extract_meta(data, max_tokens))
 
     return mk_result(task, model, "", None, 0, "exhausted_retries", "", max_retries, 0.0, reasoning_off,
                       options_shown, provider, blind)
@@ -413,9 +560,11 @@ def cmd_run(args):
 
     api_key = load_api_key(args.provider)
     done = set()
+    tried = set()
     if out_path.is_file():
         with open(out_path, newline="", encoding="utf-8") as fh:
             for row in csv.DictReader(fh):
+                tried.add(row["task_id"])
                 if is_final(row):
                     done.add(row["task_id"])
     todo = [t for t in tasks if t["task_id"] not in done]
@@ -425,7 +574,14 @@ def cmd_run(args):
         cmd_metrics_from_path(out_path)
         return
 
+    if args.max_new:
+        # next batch only: never-attempted tasks first, previously failed ones last
+        todo.sort(key=lambda t: t["task_id"] in tried)
+        todo = todo[: args.max_new]
+
     state = {}
+    if out_path.is_file():
+        migrate_results_file(out_path)
     new_file = not out_path.is_file()
     session = requests.Session()
     write_lock = threading.Lock()
@@ -567,6 +723,7 @@ def main():
     r.add_argument("--blind", action="store_true",
                     help="text-only ablation: no image sent (auto-enabled for --provider humain)")
     r.add_argument("--limit", type=int, default=None)
+    r.add_argument("--max-new", type=int, default=None, help="process at most this many unfinished tasks (fresh ones first); used by run_all.py --batch")
     r.add_argument("--out", default=None)
     r.add_argument("--min-gap", type=float, default=1.0)
     r.add_argument("--concurrency", type=int, default=1)

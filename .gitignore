@@ -17,3 +17,14 @@ analysis/results/
 # SARAB_DATA_DIR at a directory inside this repo for local development,
 # ignore it here too:
 /Sarab-Dataset-HF/
+
+# run_all.py output
+modes/_logs/
+modes/_backup_results_before_clean/
+modes/results_summary.*
+
+# personal to-do list
+TODO_LATER.md
+
+# paper analysis scripts, labels, and outputs: kept local for now
+analysis/

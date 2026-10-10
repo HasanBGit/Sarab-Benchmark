@@ -10,14 +10,14 @@ authors:
     given-names: Zahra
     affiliation: "Imam Abdulrahman Bin Faisal University"
     email: alharzzahra@gmail.com
-  - family-names: Mahyoub
-    given-names: Abdulrhman
-    affiliation: "King Khalid University"
-    email: 443814561@kku.edu.sa
   - family-names: Barmandah
     given-names: Hassan
     affiliation: "Umm Al-Qura University, Department of Software Engineering"
     email: s445001043@uqu.edu.sa
+  - family-names: Ali
+    given-names: Abdulrahman Khalid Ahmed
+    affiliation: "King Khalid University"
+    email: 443814561@kku.edu.sa
   - family-names: Alahmari
     given-names: "Saad Saeed"
     affiliation: "Najran University"

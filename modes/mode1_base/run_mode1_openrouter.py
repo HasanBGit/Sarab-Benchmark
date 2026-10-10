@@ -6,11 +6,11 @@ single source of truth -- same convention as fill_nota_questions.py, no
 separate merged base-questions file) and evaluates them against a
 vision-capable model served through OpenRouter's OpenAI-compatible API.
 
-Protocol is frozen prompt_version=1, carried over verbatim from the
-original BaseMode.ipynb (Google GenAI SDK) pilot, colocated in this
-folder -- same system instruction, same temperature=0, same yes/no-only output contract, same
-balanced-sample selection (seed=42) -- so results from this script and
-from the notebook are directly comparable. Only the transport changed:
+Protocol is prompt_version=2: the reply must START with a one-word yes/no
+(نعم / لا) followed by a ~30-word Arabic explanation; only the first word is
+scored. prompt_version=1 (one-word-only, no explanation) was the original
+BaseMode.ipynb (Google GenAI SDK) pilot protocol -- v1 and v2 results are not
+comparable. Same temperature=0 and balanced-sample selection (seed=42). Only the transport changed:
 OpenRouter's chat-completions endpoint instead of the Gemini SDK, so any
 OpenRouter vision model can be swapped in via --model.
 
@@ -81,21 +81,21 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 HUMAIN_API_URL = "https://api.node.humain.com/v1/chat/completions"
 
 # ---------------------------------------------------------------------------
-# Frozen protocol (prompt_version = 1) -- do not edit without bumping the
+# Frozen protocol (prompt_version = 2; v1 was one-word-only) -- do not edit without bumping the
 # version and re-running from scratch; changing the prompt invalidates
 # comparability with prior runs (Colab pilot and any earlier OpenRouter runs).
 # ---------------------------------------------------------------------------
 SYSTEM_INSTRUCTION_AR = (
     "انظر إلى الصورة وأجب عن السؤال بالاعتماد على ما هو ظاهر فيها. "
-    "يجب أن تكون إجابتك كلمة واحدة فقط: نعم أو لا. "
-    "لا تضف أي شرح أو علامات ترقيم أو كلمات أخرى."
+    "ابدأ إجابتك بكلمة واحدة فقط: نعم أو لا. "
+    "ثم اشرح في نحو 30 كلمة لماذا اخترت هذه الإجابة."
 )
 TEMPERATURE = 0
-PROMPT_VERSION = 1
+PROMPT_VERSION = 2
 DEFAULT_MODEL = "google/gemini-2.5-flash"
 HUMAIN_DEFAULT_MODEL = "humain-m3-preview"  # text-only on Node today -- see --blind
-MAX_OUTPUT_TOKENS = 64       # matches the notebook's reasoning-off budget
-FALLBACK_MAX_TOKENS = 512    # used if the model won't accept reasoning disabled
+MAX_OUTPUT_TOKENS = 256       # matches the notebook's reasoning-off budget
+FALLBACK_MAX_TOKENS = 4096    # used if the model won't accept reasoning disabled
 SAMPLE_SEED = 42
 SAMPLE_TARGET = {"cuisine": 4, "attire": 2, "objects": 2, "architecture": 2}  # 10 images = 20 tasks
 
@@ -206,19 +206,18 @@ def load_api_key(provider="openrouter"):
 # Answer parsing
 # ---------------------------------------------------------------------------
 def parse_answer(raw):
+    """Prompt v2: the reply must START with نعم/لا, followed by a ~30-word
+    explanation. Only the first word is scored -- the explanation may itself
+    contain yes/no words and must not influence the parsed answer."""
     if not raw:
         return "unclear"
-    text = raw.strip().strip(" \n\t\"'.,!?؟،؛:-")
-    if text in _YES_WORDS or text.lower() in _YES_WORDS:
+    tokens = re.findall(r"[^\W\d_]+", raw.strip().lstrip(" \n\t\"'.,!?؟،؛:-*#"), flags=re.UNICODE)
+    if not tokens:
+        return "unclear"
+    first = tokens[0]
+    if first in _YES_WORDS or first.lower() in _YES_WORDS:
         return "yes"
-    if text in _NO_WORDS or text.lower() in _NO_WORDS:
-        return "no"
-    tokens = re.findall(r"[^\W\d_]+", text, flags=re.UNICODE)
-    has_yes = any(t in _YES_WORDS or t.lower() in _YES_WORDS for t in tokens)
-    has_no = any(t in _NO_WORDS or t.lower() in _NO_WORDS for t in tokens)
-    if has_yes and not has_no:
-        return "yes"
-    if has_no and not has_yes:
+    if first in _NO_WORDS or first.lower() in _NO_WORDS:
         return "no"
     return "unclear"
 
@@ -271,8 +270,44 @@ def call_model(session, api_key, model, image_path, question_text, max_tokens, r
     return session.post(url, headers=headers, json=payload, timeout=timeout)
 
 
+# Per-call logging added for analysis (cost, tokens, who served the call).
+# OpenRouter returns usage and cost on every response by default.
+META_FIELDS = ["finish_reason", "prompt_tokens", "completion_tokens", "reasoning_tokens", "cost_usd",
+               "generation_id", "served_by", "response_model", "max_tokens_sent"]
+NO_META = {k: "n/a (no response)" for k in META_FIELDS}
+FIELDNAMES = FIELDNAMES + META_FIELDS
+
+
+def extract_meta(data, max_tokens):
+    """Usage/cost/provenance fields from one chat-completions response."""
+    def v(x):
+        return "n/a (not reported)" if x in (None, "") else x
+    usage = data.get("usage") or {}
+    choice = (data.get("choices") or [{}])[0]
+    details = usage.get("completion_tokens_details") or {}
+    return {
+        "finish_reason": v(choice.get("finish_reason")), "prompt_tokens": v(usage.get("prompt_tokens")),
+        "completion_tokens": v(usage.get("completion_tokens")), "reasoning_tokens": v(details.get("reasoning_tokens")),
+        "cost_usd": v(usage.get("cost")), "generation_id": v(data.get("id")), "served_by": v(data.get("provider")),
+        "response_model": v(data.get("model")), "max_tokens_sent": max_tokens,
+    }
+
+
+def migrate_results_file(path):
+    """Bring an existing results CSV up to the current columns (older rows get a label)."""
+    with open(path, newline="", encoding="utf-8") as fh:
+        rd = csv.DictReader(fh)
+        old, rows = rd.fieldnames or [], list(rd)
+    if old == FIELDNAMES:
+        return
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=FIELDNAMES, restval="n/a (before logging)", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+
+
 def mk_result(task, model, raw, parsed, error_type, detail, attempts, latency, reasoning_off,
-              provider="openrouter", blind=False):
+              provider="openrouter", blind=False, meta=None):
     gt = task["ground_truth"]
     is_correct = int((parsed == "yes" and gt == "نعم") or (parsed == "no" and gt == "لا"))
     return {
@@ -285,6 +320,7 @@ def mk_result(task, model, raw, parsed, error_type, detail, attempts, latency, r
         "reasoning_disabled": int(reasoning_off),
         "prompt_version": PROMPT_VERSION, "temperature": TEMPERATURE,
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        **(meta or NO_META),
     }
 
 
@@ -295,11 +331,12 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
                           provider, blind)
 
     reasoning_off = state.get(model, True)
+    extra = 0  # doublings of the token budget after repeated 'length' cutoffs
     for attempt in range(1, max_retries + 1):
         gap = min_gap - (time.time() - last_call[0])
         if gap > 0:
             time.sleep(gap)
-        max_tokens = MAX_OUTPUT_TOKENS if reasoning_off else FALLBACK_MAX_TOKENS
+        max_tokens = (MAX_OUTPUT_TOKENS if reasoning_off else FALLBACK_MAX_TOKENS) * (2 ** extra)
         t0 = time.time()
         last_call[0] = t0
         try:
@@ -350,15 +387,20 @@ def run_one_task(session, api_key, model, task, min_gap, max_retries, state, las
 
         if not raw:
             blocked = any(k in finish_reason for k in ("content_filter", "safety"))
-            if not blocked and finish_reason == "length" and reasoning_off and attempt < max_retries:
-                # reasoning likely ate the whole (small) budget even though "disabled" wasn't honored
-                reasoning_off = False
-                continue
+            if not blocked and finish_reason == "length" and attempt < max_retries:
+                # reasoning likely ate the whole budget: first stop forcing reasoning off,
+                # then keep doubling the token budget (up to 4x) before giving up
+                if reasoning_off:
+                    reasoning_off = False
+                    continue
+                if extra < 2:
+                    extra += 1
+                    continue
             return mk_result(task, model, "", "unclear", "safety_block" if blocked else "empty_response",
-                              finish_reason, attempt, latency, reasoning_off, provider, blind)
+                              finish_reason, attempt, latency, reasoning_off, provider, blind, meta=extract_meta(data, max_tokens))
 
         return mk_result(task, model, raw, parse_answer(raw), "", "", attempt, latency, reasoning_off,
-                          provider, blind)
+                          provider, blind, meta=extract_meta(data, max_tokens))
 
     return mk_result(task, model, "", "unclear", "exhausted_retries", "", max_retries, 0.0, reasoning_off,
                       provider, blind)
@@ -406,9 +448,11 @@ def cmd_run(args):
     api_key = load_api_key(args.provider)
 
     done = set()
+    tried = set()
     if out_path.is_file():
         with open(out_path, newline="", encoding="utf-8") as fh:
             for row in csv.DictReader(fh):
+                tried.add(row["task_id"])
                 if is_final(row):
                     done.add(row["task_id"])
     todo = [t for t in run_tasks if t["task_id"] not in done]
@@ -418,7 +462,14 @@ def cmd_run(args):
         cmd_metrics_from_path(out_path)
         return
 
+    if args.max_new:
+        # next batch only: never-attempted tasks first, previously failed ones last
+        todo.sort(key=lambda t: t["task_id"] in tried)
+        todo = todo[: args.max_new]
+
     state = {}
+    if out_path.is_file():
+        migrate_results_file(out_path)
     new_file = not out_path.is_file()
     session = requests.Session()
     write_lock = threading.Lock()
@@ -632,6 +683,7 @@ def main():
     r.add_argument("--run-label", choices=["sample", "full"], default="sample",
                     help="sample = balanced 10-image/20-task set (seed=42); full = all 270 images/540 tasks")
     r.add_argument("--limit", type=int, default=None, help="cap the number of tasks (after sample/full selection)")
+    r.add_argument("--max-new", type=int, default=None, help="process at most this many unfinished tasks (fresh ones first); used by run_all.py --batch")
     r.add_argument("--out", default=None, help="output CSV path (default: mode1_results/results_mode1_<label>_<model>.csv)")
     r.add_argument("--min-gap", type=float, default=1.0, help="minimum seconds between requests when --concurrency=1 (default: 1.0)")
     r.add_argument("--concurrency", type=int, default=1, help="run this many requests in parallel via a thread pool (default: 1 = sequential, paced by --min-gap)")
