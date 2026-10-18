@@ -1,0 +1,25 @@
+task_id,model,label,labelled_by
+architecture_ithra_screenshot_2023_10_31_111338__udr__core,google/gemini-2.5-flash,TRUE,assistant (single pass); needs a human check
+architecture_the_clock_towers_watch_13__udr__core,google/gemini-2.5-flash,TRUE,assistant (single pass); needs a human check
+cuisine_cuisine_of_the_united_arab_emirates_08__udr__core,google/gemini-2.5-flash,FALSE,assistant (single pass); needs a human check
+architecture_al_faisaliah_tower_f10__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+attire_82693_ensemble__udr__core,meta/muse-glimmer-30b,FALSE,assistant (single pass); needs a human check
+architecture_diriyah_d12__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+architecture_kingdom_tower_mam_13__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+architecture_the_clock_towers_watch_13__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+architecture_hegra_hegra_12__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+attire_85620_burnus_selham__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+architecture_ithra_screenshot_2023_10_31_111338__udr__core,meta/muse-glimmer-30b,TRUE,assistant (single pass); needs a human check
+cuisine_cuisine_of_egypt_05__udr__core,meta/muse-glimmer-30b,FALSE,assistant (single pass); needs a human check
+cuisine_cuisine_of_jordan_06__udr__core,meta/muse-glimmer-30b,FALSE,assistant (single pass); needs a human check
+architecture_the_clock_towers_watch_13__udr__core,mistralai/mistral-large-4-0,TRUE,assistant (single pass); needs a human check
+cuisine_cuisine_of_egypt_05__udr__core,mistralai/mistral-large-4-0,FALSE,assistant (single pass); needs a human check
+architecture_al_faisaliah_tower_f10__udr__core,openai/gpt-5-mini,TRUE,assistant (single pass); needs a human check
+architecture_the_clock_towers_watch_13__udr__core,openai/gpt-5-mini,TRUE,assistant (single pass); needs a human check
+architecture_kingdom_tower_mam_13__udr__core,openai/gpt-5-mini,TRUE,assistant (single pass); needs a human check
+cuisine_cuisine_of_egypt_05__udr__core,openai/gpt-5-mini,FALSE,assistant (single pass); needs a human check
+cuisine_cuisine_of_the_united_arab_emirates_08__udr__core,qwen/qwen2.5-vl-72b-instruct,FALSE,assistant (single pass); needs a human check
+architecture_al_faisaliah_tower_f10__udr__core,z-ai/glm-5.3-flash,TRUE,assistant (single pass); needs a human check
+architecture_the_clock_towers_watch_13__udr__core,z-ai/glm-5.3-flash,TRUE,assistant (single pass); needs a human check
+cuisine_cuisine_of_egypt_05__udr__core,z-ai/glm-5.3-flash,FALSE,assistant (single pass); needs a human check
+cuisine_cuisine_of_the_united_arab_emirates_08__udr__core,z-ai/glm-5.3-flash,FALSE,assistant (single pass); needs a human check

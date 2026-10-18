@@ -1,0 +1,329 @@
+:root {
+  --ink: #21262a;
+  --ink-deep: #171b1e;
+  --ink-line: #3a4247;
+  --paper: #e8dcc3;
+  --paper-shadow: #cabf9f;
+  --paper-text: #2a241a;
+  --paper-text-soft: #6b6250;
+  --correct: #7c9473;
+  --correct-deep: #566a4f;
+  --rejected: #a6543a;
+  --rejected-deep: #7c3d29;
+  --edited: #c99a3e;
+  --edited-deep: #96702a;
+  --paper-off-white: #f4efe1;
+
+  --font-arabic: 'Amiri', 'Geeza Pro', Tahoma, serif;
+  --font-ui: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem 3rem;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--edited);
+  outline-offset: 2px;
+}
+
+.drawer {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ---- topbar ---- */
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--ink-line);
+  padding-bottom: 0.75rem;
+}
+
+.topbar-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9aa5aa;
+}
+
+.topbar-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+#progress-count {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--paper);
+  white-space: nowrap;
+}
+
+.progress-track {
+  width: 90px;
+  height: 4px;
+  background: var(--ink-line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--edited);
+  width: 0%;
+  transition: width 0.25s ease;
+}
+
+/* ---- card ---- */
+
+.stage {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  background: var(--paper);
+  color: var(--paper-text);
+  border-radius: 2px;
+  box-shadow: 0 1px 0 var(--paper-shadow) inset, 0 18px 40px -20px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.card-image-mat {
+  background: var(--ink-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  max-height: 420px;
+  padding: 1.25rem;
+}
+
+#object-image {
+  max-width: 100%;
+  max-height: 380px;
+  object-fit: contain;
+  display: block;
+}
+
+.card-rule {
+  height: 1px;
+  background: var(--paper-shadow);
+  margin: 0 1.5rem;
+}
+
+.card-body {
+  padding: 1.4rem 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper-text-soft);
+  text-align: right;
+}
+
+.field-text {
+  margin: 0;
+  font-family: var(--font-arabic);
+  line-height: 1.9;
+}
+
+.field-caption {
+  font-size: 1.15rem;
+}
+
+.field-hitem {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.field-input {
+  font-family: var(--font-arabic);
+  background: var(--paper-off-white);
+  border: 1px solid var(--paper-shadow);
+  border-radius: 3px;
+  padding: 0.6rem 0.75rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.field-input.field-caption {
+  font-size: 1.05rem;
+  min-height: 4.5rem;
+}
+
+.field-input.field-hitem {
+  font-size: 1.2rem;
+  font-weight: 700;
+  min-height: 2.6rem;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  padding: 0.75rem 1.5rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--paper-text-soft);
+  border-top: 1px dashed var(--paper-shadow);
+  margin-top: 0.2rem;
+}
+
+/* ---- stamp ---- */
+
+.card-stamp {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.1rem;
+  padding: 0.35rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  transform: rotate(-8deg) scale(0.9);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(232, 220, 195, 0.9);
+}
+
+.card-stamp.visible {
+  opacity: 0.92;
+  transform: rotate(-8deg) scale(1);
+}
+
+.card-stamp.stamp-press {
+  animation: stamp-in 0.32s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.card-stamp.status-correct { color: var(--correct-deep); border-color: var(--correct); }
+.card-stamp.status-rejected { color: var(--rejected-deep); border-color: var(--rejected); }
+.card-stamp.status-edited { color: var(--edited-deep); border-color: var(--edited); }
+
+@keyframes stamp-in {
+  0% { opacity: 0; transform: rotate(-8deg) scale(1.9); }
+  60% { opacity: 0.95; transform: rotate(-8deg) scale(0.85); }
+  100% { opacity: 0.92; transform: rotate(-8deg) scale(1); }
+}
+
+/* ---- controls ---- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.controls-nav, .controls-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn {
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: 1px solid var(--ink-line);
+  background: transparent;
+  color: var(--paper);
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:hover { background: rgba(255, 255, 255, 0.06); }
+
+.btn[hidden] { display: none; }
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+}
+
+.btn-key {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #9aa5aa;
+}
+
+.btn-forward {
+  border-color: var(--correct);
+  color: var(--correct);
+}
+.btn-forward:hover { background: rgba(124, 148, 115, 0.14); }
+
+.btn-reject {
+  border-color: var(--rejected);
+  color: var(--rejected);
+}
+.btn-reject:hover { background: rgba(166, 84, 58, 0.14); }
+
+.btn-edit, .btn-save {
+  border-color: var(--edited);
+  color: var(--edited);
+}
+.btn-edit:hover, .btn-save:hover { background: rgba(201, 154, 62, 0.14); }
+
+.btn-cancel { color: #9aa5aa; }
+
+@media (max-width: 480px) {
+  body { padding: 1.25rem 0.75rem 2rem; }
+  .controls { justify-content: center; }
+  .controls-nav, .controls-actions { flex: 1 1 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-stamp.stamp-press { animation: none; }
+  .progress-fill { transition: none; }
+}

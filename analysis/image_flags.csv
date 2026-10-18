@@ -1,0 +1,9 @@
+mode,index_in_mode,image_id,flag,"what_I_saw (assistant, by eye; verify)"
+Ground,33,image_502,licensing,visible Bigstock watermark and image ID (commercial stock photo) in a CC-BY dataset
+Ground,40,image_593,privacy/consent,photograph of an identifiable real person
+Ground,41,image_586,privacy/consent,photograph of a real private individual at an event; question asks her nationality
+Ground,34,image_506,ethics + synthetic,"question asks a man's nationality from his clothing; image looks AI-generated, so provenance and consent unclear"
+Ground,35,image_507,ethics + synthetic,question asks a man's nationality; image looks AI-generated
+Sway,20,objects_date_picking_basket,synthetic/licensing,"small four-point star in the corner resembles an AI-generation watermark: may be synthetic, not a real photo"
+Sway,24,script_ruqah_ruq17,licensing,faint website watermark visible in the corner
+False,10,script_nastaliq_nas19,licensing/attribution,website address and artist credit printed in the margin

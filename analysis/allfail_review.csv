@@ -1,0 +1,99 @@
+mode,index_in_mode,image_id,category,true_identity,distractor,verdict,"note (assistant, looked at the image; needs a native-speaker check)"
+Ground,1,image_111A;image_111B,cuisine,ورق عنب,محشي,DOUBT-label,"stuffed grape leaves; distractor 'mahshi' (stuffed) overlaps the true label, so the expected 'no' is debatable"
+Ground,2,image_116A;image_116B,cuisine,ورق عنب,محشي,OK-ambiguous,"a raw vine leaf with rolled leaves at the edge; 'warak enab' is literally right, 'mahshi' no; the picture is not the cooked dish"
+Ground,3,image_142A;image_142B,cuisine,شيش برك,يُطهى في صلصة طماطم,DOUBT-question,"raw dumplings, no sauce visible; yogurt vs tomato sauce cannot be seen, only known from the dish (shish barak)"
+Ground,4,image_138A;image_138B,cuisine,لحم بعجين,مسخن,OK,"meat flatbreads in an oven, lahm bi ajeen; label fits; hard because several similar breads exist"
+Ground,5,image_139A;image_139B,cuisine,مجبوس,كبسة,DOUBT-label,"rice and meat tray; majbous and kabsa are near-synonyms in the Gulf, cannot be told apart by sight"
+Ground,6,image_133A;image_133B,cuisine,ورق عنب,محشي,DOUBT-label,plate with stuffed grape leaves; 'mahshi' distractor overlaps the true label
+Ground,7,image_137A;image_137B,cuisine,مجبوس,كبسة,DOUBT-label,chicken rice with nuts and raisins; majbous vs kabsa are near-synonyms
+Ground,8,image_153A;image_153B,cuisine,مجبوس,كبسة,DOUBT-label,spiced chicken rice with cinnamon; majbous vs kabsa near-synonyms
+Ground,9,image_166A;image_166B,cuisine,منسف,مندي,OK,clearly mansaf: lamb with jameed sauce on rice under thin bread; genuine model failure
+Ground,10,image_170A;image_170B,cuisine,مكدوس,محشي,DOUBT-label,"stuffed eggplants with walnuts and chilli (makdous-like); makdous is itself stuffed, so 'mahshi' overlaps"
+Ground,11,image_169A;image_169B,cuisine,يخنة,شكشوكة,DOUBT-label,tomato and egg in a copper pan with cheese and tea looks like shakshuka or menemen; the label says yakhna
+Ground,12,image_172A;image_172B,cuisine,بسطيلة,مزيّنة بالسكر البودرة والقرفة,DOUBT-label,"almond pastry with pistachio, rose buds and quail eggs (bastila); the 'garnished with lemon and herbs = yes' label does not match the image"
+Ground,13,image_165A;image_165B,cuisine,زيت زيتون,زيت مكرر مُعالَج صناعيًا,DOUBT-question,a bottle of green oil; 'virgin and unrefined' vs 'industrially refined' cannot be told from a photo
+Ground,14,image_167A;image_167B,cuisine,زرب,شية,UNSURE,tiered rack of roasted meat in a Bedouin setting; zarb vs generic grilled meat (shiyya) is hard to tell by eye
+Ground,15,image_171A;image_171B,cuisine,فتة حمص,حمص,DOUBT-label,"hummus topped with fried onion and almonds; fatteh hummus is hummus-based, so the 'hummus' distractor overlaps"
+Ground,16,image_198A;image_198B,cuisine,ورق عنب,كوسا محشي,DOUBT-label,"stuffed vine leaves, zucchini and peppers; vine-leaf rolls are themselves stuffed, so 'mahshi' overlaps"
+Ground,17,image_205A;image_205B,cuisine,مجبوس,كبسة,DOUBT-label,chicken rice with boiled eggs and nuts; majbous vs kabsa near-synonyms
+Ground,18,image_190A;image_190B,cuisine,كعك أصفر,كبانة,UNSURE,large round seeded yellow bread; a regional bread I cannot verify from the picture
+Ground,19,image_225A;image_225B,cuisine,عصيدة,بازين,DOUBT-label,porridge with a well of sauce on a woven mat; asida vs bazin are very similar dishes
+Ground,20,image_214A;image_214B,cuisine,مكدوس,محشي,DOUBT-label,"clearly makdous (pickled stuffed eggplant, walnuts, chilli); but makdous is itself stuffed, so the 'mahshi' distractor overlaps"
+Ground,21,image_230A;image_230B,cuisine,لحوح,تُصنع من دقيق الذرة الرفيعة لا القمح,DOUBT-question,a thin pancake-like bread with holes; wheat vs sorghum flour cannot be seen
+Ground,22,image_239A;image_239B,cuisine,عصيدة بالدجاج,عصيدة,DOUBT-label,"asida with chicken pieces in turmeric; the 'asida' distractor is the same dish family, so 'no' is debatable"
+Ground,23,image_219A;image_219B,cuisine,كبسة,مجبوس,DOUBT-label,"rice with meat cubes, carrot and raisins looks like Bukhari/pilaf style; kabsa vs majbous cannot be settled by eye"
+Ground,24,image_229A;image_229B,cuisine,ورق عنب,محشي,DOUBT-label,stuffed vine leaves with tomato and onion; 'mahshi' overlaps
+Ground,25,image_223A;image_223B,cuisine,حبة سوداء,سمسم,DOUBT-label,large dark-maroon fruits with a yellow kernel; this does not look like tiny black nigella seeds (habba sawda)
+Ground,26,image_233A;image_233B,cuisine,ورق عنب,محشي,DOUBT-label,stuffed vine leaves with lemon; 'mahshi' overlaps
+Ground,27,image_238A;image_238B,cuisine,ورق عنب,محشي,DOUBT-label,rolled vine leaves and one open leaf with filling; 'mahshi' overlaps
+Ground,28,image_247A;image_247B,cuisine,عصيدة,بازين,OK-medium,"dark round dough with a well of ghee, typical asida; telling it from bazin needs knowledge"
+Ground,29,image_249A;image_249B,cuisine,شاورما,لحم مفروم مُشكَّل,DOUBT-question,cut shawarma wraps with pickles; the stacked-slices attribute is not visible inside rolled bread
+Ground,30,image_270A;image_270B,cuisine,لحوح,تُصنع من دقيق الذرة الرفيعة لا القمح,DOUBT-question,thin pancake bread on a metal tray; wheat vs sorghum flour cannot be seen
+Ground,31,image_269A;image_269B,cuisine,منسف,مندي,OK,"lamb in jameed sauce on rice with toasted nuts, mansaf; label fits (low image quality)"
+Ground,32,image_472,cuisine,خبز التنور بالعسل,خبز الصاج,OK-medium,three-panel collage of seeded tandoor bread with a liquid being poured; plausible
+Ground,33,image_502,attire,نقاب,غطاء الرأس,DOUBT-label,woman in a niqab on a horse; a niqab is itself a head covering so the 'head cover' distractor overlaps. The image carries a visible Bigstock watermark and ID: licensing red flag
+Ground,34,image_506,attire,رجل عُماني,رجل إماراتي,DOUBT-question,"man in a grey dishdasha with a tassel; Omani vs Emirati cannot be read from clothing or face, and the image looks synthetic; nationality inference"
+Ground,35,image_507,attire,رجل يمني,رجل عُماني,DOUBT-question,man in a suit and red shemagh in a lecture hall; Yemeni vs Omani cannot be read from the picture; looks synthetic; nationality inference
+Ground,36,image_533,cuisine,صفيحة لحم,لحم بعجين,DOUBT-label,small open meat pies with pine nuts; sfiha and lahm bi ajeen are essentially the same dish
+Ground,37,image_571,cuisine,شاورما,لحم مفروم مُشكَّل,DOUBT-question,grilled shawarma wraps cut into pieces with fries; the stacked marinated slices cannot be seen inside the bread
+Ground,38,image_552,attire,عباية,الثوب الفلسطيني المطرز,DOUBT-label,"woman in a black open abaya with red Palestinian tatreez panels; the embroidery is Palestinian, so the 'Palestinian embroidered thobe' distractor overlaps"
+Ground,39,image_564,cuisine,فول مدمس,حمص,DOUBT-label,"whole chickpeas and beans with tomato and parsley; not mashed ful, and 'hummus' literally means chickpeas"
+Ground,40,image_593,attire,مصر,كمّة,OK-ethics,older man in an Omani turban (massar) and bisht; label plausible. It is a photograph of an identifiable real person: privacy and consent flag
+Ground,41,image_586,attire,امرأة سعودية,نقاب,DOUBT-question,"young woman in a black headscarf and abaya at an event; nationality cannot be read from a photo, and it is a real private person: ethics flag"
+Sway,1,architecture_al_rahmah_mosque_m1,architecture,مسجد الرحمة (المسجد العائم),مسجد تانجونج بونجاه العائم، بينانج، ماليزيا,OK,"floating mosque on a pier with a blue dome and white minaret, Al-Rahma Jeddah at sunset; models trusted the Penang caption"
+Sway,2,architecture_al_rahmah_mosque_m10,architecture,مسجد الرحمة (المسجد العائم),مسجد تانجونج بونجاه العائم، بينانج، ماليزيا,OK,Al-Rahma at night with blue lighting (heavily colour-processed); models trusted the Penang caption
+Sway,3,attire_119451_kaftan,attire,كافتان حريري,جبة دمشقية حريرية,DOUBT-label,"long striped silk robe with a crossed front opening on a mannequin; the caption's description (jubbah) matches the picture, kaftan vs jubbah overlaps"
+Sway,4,cuisine_cuisine_of_egypt_07,cuisine,أرز بلبن مصري,مهلبية بالأرز,DOUBT-label,"two bowls of white rice pudding; rice with milk vs muhallabia with rice look the same, the label rests on the source"
+Sway,5,cuisine_cuisine_of_saudi_arabia_07,cuisine,دقوس (صلصة طماطم),صلصة شكشوكة,DOUBT-label,tomato sauce with green chilli slices; daqous vs shakshuka sauce look the same
+Sway,6,attire_86267_abaya_cloak,attire,عباءة,روب إيكات أوزبكي,UNSURE,"blue ikat-patterned cloak on a mannequin; abaya vs Uzbek chapan cannot be verified by eye, the label relies on the museum record"
+Sway,7,attire_86249_festive_dress_from_qalamun,attire,ثوب احتفالي من القلمون (سوريا),ثوب حوراني مطرز,DOUBT-label,"beige coat with an embroidered chest panel on a mannequin; the caption (Hauran thobe) describes it accurately, Qalamun vs Hauran cannot be seen"
+Sway,8,cuisine_cuisine_of_saudi_arabia_11,cuisine,أقراص فول مقلية بقالب الوافل,فلافل مقلية بقالب الوافل,DOUBT-label,fried waffle-patterned discs; fava-bean discs vs falafel discs cannot be told by eye
+Sway,9,cuisine_cuisine_of_jordan_05,cuisine,دلة قهوة بدوية على نار الحطب,إبريق شاي بدوي,DOUBT-label,black lidded pot on a brush fire in sand; coffee pot (dallah) vs tea kettle is indistinct
+Sway,10,architecture_al_rahmah_mosque_m12,architecture,مسجد الرحمة (المسجد العائم),مسجد تانجونج بونجاه العائم، بينانج، ماليزيا,OK,"white floating mosque at night with a tall white minaret and arcades, Al-Rahma; a genuine caption-trust failure"
+Sway,11,attire_86275_abaya_cloak,attire,عباءة سورية حمراء مخططة (نسخة ثانية),معطف بدوي أحمر مخطط بالساتان,DOUBT-label,red cloak with pink triangular insets (museum object); the true label text contains the annotation '(نسخة ثانية)' (second copy) and the cloak is not visibly striped
+Sway,12,attire_86251_headscarf,attire,غطاء رأس فلسطيني مطرز (منديل),شال حوراني مطرز بالحرير,DOUBT-label,embroidered cream cloth with red cross-stitch motifs and fringe; headcover vs shawl and Palestinian vs Hauran cannot be verified by eye
+Sway,13,objects_electronic_tasbih_counter,objects,سبحة إلكترونية (عداد تسبيح إصبعي),عداد جولف يدوي إصبعي,DOUBT-label,"a blue plastic finger 'TALLY COUNTER'; the same physical object is a prayer-bead counter or a golf counter, the label depends on use not appearance"
+Sway,14,cuisine_levantine_cuisine_04,cuisine,مهلبية بالفستق وماء الورد,أشطة بالعسل,DOUBT-label,six cups of cream pudding with pistachio and rose petals and a honey carafe; muhallabia vs ashta with honey look alike
+Sway,15,objects_mihmas_coffee_roaster,objects,محماس (مقلاة تحميص قهوة تقليدية),رفش صغير لجمر الموقد (أداة تحريك الفحم),UNSURE,old long-handled shallow metal pan or shovel on a carpet; mihmas vs coal shovel cannot be verified from the picture
+Sway,16,cuisine_cuisine_of_the_united_arab_emirates_05,cuisine,هريس إماراتي,مفركة يمنية,OK-medium,"large bowl of smooth thick pale porridge, consistent with harees"
+Sway,17,objects_447019_pierced_globe,objects,مبخرة كروية مثقوبة,قنديل نحاسي مثقوب,UNSURE,"pierced copper globe with Arabic inscription and a ring (museum object); censer vs lantern depends on use, not visible"
+Sway,18,cuisine_cuisine_of_the_united_arab_emirates_01,cuisine,هريس إماراتي,جريش سعودي,DOUBT-label,"coarse wheat porridge with a butter cube and cinnamon sticks; harees vs jareesh are near-identical, distinction is by country"
+Sway,19,objects_rebaba_spike_fiddle,objects,ربابة (آلة وترية بدوية),كمان بدائي الصنع بصندوق جلدي,OK,flat leather-covered box with a long neck and a bow: a rababa (spike fiddle); the label fits
+Sway,20,objects_date_picking_basket,objects,مخرفة (سلة قطف التمر),سلة تسوق يدوية منسوجة,DOUBT-label,woven palm-leaf basket with rope handles; date-picking basket vs shopping basket depends on use. A small four-point star in the corner looks like an AI-generation watermark: the image may be synthetic
+Sway,21,objects_qanun_zither,objects,قانون (آلة وترية),سنطور (آلة إيقاعية وترية مسطحة),OK,"trapezoid zither with many strings, rose windows and tuning levers (looks like a 3D render): a qanun; the label fits"
+Sway,22,script_ruqah_ruq16,script,خط الرقعة,خط النسخ,OK-medium,short compact handwritten lines consistent with Ruq'ah; models trusted the 'Naskh' caption
+Sway,23,script_ruqah_ruq15,script,خط الرقعة,خط النسخ,DOUBT-label,slanted flowing purple script with no clear baseline; looks more like Persian Taliq than Ruq'ah
+Sway,24,script_ruqah_ruq17,script,خط الرقعة,خط النسخ,OK-medium,"bold marker script next to a reed pen, plausibly Ruq'ah; a faint site watermark is visible in the corner"
+Sway,25,script_ruqah_ruq21,script,خط الرقعة,خط النسخ,UNSURE,"thick-nib green script in an oval; Ruq'ah vs Naskh cannot be settled by a non-expert, needs a calligrapher"
+Sway,26,script_thuluth_2_160,script,خط الثلث,خط ديواني,OK,framed gold Thuluth panel on black with an ornamental border; the label fits and the Diwani caption is plainly wrong
+Sway,27,script_naskh_naskh13,script,خط النسخ,خط الرقعة,OK-medium,"black vocalised script on paper, plausibly Naskh; expert check advised"
+Sway,28,script_naskh_naskh18,script,خط النسخ,خط الرقعة,OK-medium,"red and black vocalised script, plausibly Naskh; expert check advised"
+Sway,29,script_naskh_3_182,script,خط النسخ,خط الرقعة,UNSURE,casual pen lettering with floral doodles on lined paper; style label needs an expert
+Sway,30,script_thuluth_2_176,script,خط الثلث,خط ديواني,UNSURE,purple decorative name lettering; Thuluth vs Diwani needs an expert
+Sway,31,script_thuluth_6_569,script,خط الثلث,خط ديواني,DOUBT-label,the single word 'الله' in green on a dark background; one word cannot establish a script style
+Sway,32,script_thuluth_5_169,script,خط الثلث,خط ديواني,UNSURE,framed bold modern 'الله أكبر'; Thuluth vs Diwani needs an expert
+Sway,33,script_diwani_6_489,script,خط ديواني,خط الثلث,OK-medium,"dense interlaced colourful composition with no baseline, consistent with Diwani (jali)"
+Sway,34,script_diwani_7_845,script,خط ديواني,خط الثلث,UNSURE,"framed 'يا الله' rendered in pearls or dots; decorative, style cannot be judged"
+Sway,35,script_thuluth_4_399,script,خط الثلث,خط ديواني,OK-medium,wall art with a mosque drawing and 'رحمة للعالمين' in a Thuluth-like hand; looks like a rendered mock-up
+Sway,36,script_naskh_6_360,script,خط النسخ,خط الرقعة,UNSURE,3D mirrored gold cut-out 'سبحان الله'; Naskh vs Ruq'ah cannot be judged from a letter-form cut-out
+Sway,37,script_diwani_6_267,script,خط ديواني,خط الثلث,UNSURE,"3D gold wall calligraphy with tall separated letters and sweeping curved tails; looks closer to the Thuluth caption than to the Diwani label, needs an expert"
+False,1,architecture_king_abdullah_financial_district_kafd_k11,architecture,مركز الملك عبدالله المالي (كافد),مركز دبي المالي العالمي (DIFC),OK-medium,"night aerial view of angular glass towers and highways, consistent with KAFD in Riyadh; the Dubai caption is wrong"
+False,2,architecture_diriyah_d1,architecture,حي الطريف بالدرعية,قصر المربع التاريخي,OK-medium,"large mud-brick complex behind palms with a grid of small windows, consistent with At-Turaif in Diriyah; At-Turaif vs Al-Murabba is hard to separate by eye"
+False,3,architecture_ibrahim_palace_screenshot_2023_11_16_093223,architecture,قصر إبراهيم بالهفوف,قلعة زعبل بسكاكا (الجوف),UNSURE,"tall round corner tower, crenellated mud walls, big Saudi flag; resembles Masmak Fort (Riyadh) but Qasr Ibrahim (Hofuf) also has a round tower, cannot confirm; file name says 'palace screenshot'"
+False,4,attire_85630_dress,attire,فستان جزائري بتطريز ذهبي,فستان مصري تقليدي مطرز,DOUBT-label,"long dark sleeveless dress with gold V-neck embroidery on a mannequin; the Egyptian caption describes it accurately, Algerian vs Egyptian cannot be seen"
+False,5,attire_85641_wedding_tunic_and_ensemble,attire,ثوب زفاف تونسي معدني,بوبو غرب أفريقي فاخر بأكمام مربعة,DOUBT-label,"gold metallic tunic with square sleeves on a mannequin; the West African boubou caption describes it accurately, Tunisian vs West African cannot be seen"
+False,6,architecture_quba_mosque_quba_10,architecture,مسجد قباء,مسجد القبلتين,OK,white mosque with three tall minarets and several domes: consistent with Quba Mosque; the two-domes-one-minaret Qiblatayn caption is wrong
+False,7,attire_85625_jacket,attire,جاكيت (كاروكو) جزائري مطرز,صدرية زوف عثمانية مطرزة,DOUBT-label,"short olive-green jacket with gold-thread embroidery on a mannequin; the Ottoman-vest caption describes it accurately, Algerian vs Ottoman cannot be seen"
+False,8,attire_85659_dress,attire,فستان مصري بيج بتطريز صدر مثلثي,ثوب بدوي سيناوي مطرز,DOUBT-label,long dark sheer gold-and-black dress with a red triangular chest panel; the label says 'beige' which the picture does not show
+False,9,attire_86241_festive_dress_from_quteife,attire,ثوب احتفالي من قطيفة (سوريا),ثوب فلسطيني تقليدي,DOUBT-label,"red long dress with wide sleeves and embroidered side panels; Palestinian caption vs Syrian label, provenance cannot be seen"
+False,10,script_nastaliq_nas19,script,خط فارسي (تعليق),خط ديواني,OK-medium,"slanted flowing calligraphy with red marks, plausibly Persian Taliq; a website credit is printed in the margin"
+False,11,script_nastaliq_3_263,script,خط فارسي (تعليق),خط ديواني,OK-medium,"dark purple script with red marks and a marker pen visible, plausibly Taliq; expert check advised"
+False,12,objects_447008_incense_burner,objects,مبخرة,دلة قهوة نحاسية مطعمة,DOUBT-label,"domed metal vessel on four legs with a long tube spout (museum object); the coffee-pot caption describes it accurately, incense burner vs pot depends on the museum record"
+False,13,cuisine_cuisine_of_saudi_arabia_05,cuisine,أرز بخاري بالدجاج,كبسة دجاج,DOUBT-label,"tray of orange-yellow rice with chicken, almonds and cucumber; Bukhari rice vs kabsa are near-synonyms, though the caption's 'red rice' is wrong"
+False,14,attire_86546_cape,attire,عباءة عراقية مطرزة بغطاء رأس,برنوس مغربي تقليدي,DOUBT-label,cream hooded cape with fine tonal embroidery and tassels on a mannequin; Iraqi abaya vs Moroccan burnous cannot be seen
+False,15,cuisine_cuisine_of_jordan_01,cuisine,سمبوسك مقلي بحشوة لحم,سمبوسة هندية,OK-medium,"half-moon fried pastries with two sauces; the triangular Indian samosa caption is wrong, the filling cannot be seen"
+False,16,cuisine_cuisine_of_egypt_01,cuisine,أرز مندي بالدجاج,كبسة دجاج,OK-medium,"pot of yellow rice with roast chicken and a butter-stuffed onion; the caption's 'red rice' is wrong, mandi vs kabsa still overlap"
+False,17,attire_89306_wedding_ensemble,attire,ثوب زفاف احتفالي,قفطان مغربي مطرز بخيوط الصقلي,DOUBT-label,gold brocade V-neck tunic on a mannequin; the true label is the very generic 'festive wedding dress' while the caption's description fits the garment
+False,18,cuisine_cuisine_of_saudi_arabia_06,cuisine,سليق دجاج,مندي دجاج,OK,"white creamy rice with roast chicken, fried onion and a green chilli, consistent with saleeq; the golden-saffron mandi caption is wrong"
+False,19,cuisine_cuisine_of_egypt_11,cuisine,سمك مشوي مصري,سمك صيادية,OK,"whole grilled fish with onion rings and green peppers, no rice visible; the sayadiyya (fish over rice) caption is wrong and the label fits"
+False,20,script_nastaliq_nas47,script,خط فارسي (تعليق),خط ديواني,OK-medium,"fine slanted sharp-nibbed script with a descending baseline, consistent with Taliq; the Diwani caption is wrong"

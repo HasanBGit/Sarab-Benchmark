@@ -1,0 +1,28 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+report/
+# Local evaluation output; the real result CSVs live in the dataset (see
+# below), not in this repo.
+modes/*/mode*_results/
+# Same reasoning for analysis/category_error_analysis.py's output: derived
+# from the dataset's result CSVs, regenerable on demand, not committed.
+analysis/results/
+# The dataset (images, candidate pools, per-mode question sets, and result
+# CSVs) is not committed to this repo; it lives on Hugging Face
+# (Sarab-MLLMs/sarab). Scripts resolve it via SARAB_DATA_DIR, a sibling
+# Sarab-Dataset-HF/ checkout, or an automatic Hub download. If you point
+# SARAB_DATA_DIR at a directory inside this repo for local development,
+# ignore it here too:
+/Sarab-Dataset-HF/
+
+# run_all.py output
+modes/_logs/
+modes/_backup_results_before_clean/
+modes/results_summary.*
+
+# personal to-do list
+TODO_LATER.md
+

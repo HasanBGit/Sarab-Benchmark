@@ -1,0 +1,6 @@
+requests
+# huggingface_hub is only imported when SARAB_DATA_DIR is unset and no
+# sibling Sarab-Dataset-HF/ checkout exists next to this repo, i.e. only
+# needed if you are fetching the dataset straight from the Hugging Face Hub
+# instead of a local copy.
+huggingface_hub
